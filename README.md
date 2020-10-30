@@ -84,8 +84,8 @@ echo $file->visits; // File's visits (Visitable File)
 #### URL & Uploader
 
 ```php
-echo $file->url(); // Getting Uploaded File's URL
-// <img src"{{ $file->url() }}" alt="{{ $file->name }}">
+echo $file->url; // Getting Uploaded File's URL
+// <img src"{{ $file->url }}" alt="{{ $file->name }}">
 
 $user = $file->uploader; // Getting Uploader's Model
 ```

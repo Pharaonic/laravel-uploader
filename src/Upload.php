@@ -126,7 +126,7 @@ class Upload extends Model
     /**
      * Get Url
      */
-    public function url()
+    public function getUrlAttribute()
     {
         return route('uploaded', $this->hash);
     }
