@@ -16,7 +16,7 @@
 Install the latest version using [Composer](https://getcomposer.org/):
 
 ```bash
-$ composer require raggitech/laravel-uploader
+$ composer require pharaonic/laravel-uploader
 ```
 
 then publish the migration & config files
