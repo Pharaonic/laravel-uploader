@@ -14,10 +14,7 @@ class UploaderServiceProvider extends ServiceProvider
     public function register()
     {
         // Config Merge
-        $this->mergeConfigFrom(__DIR__ . '/config/uploader.php', 'laravel-uploader');
-
-        // Loads
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->mergeConfigFrom(__DIR__ . '/config/uploader.php', ['pharaonic', 'laravel-uploader']);
     }
 
     /**
@@ -32,9 +29,12 @@ class UploaderServiceProvider extends ServiceProvider
             __DIR__ . '/config/uploader.php'                        => config_path('Pharaonic/uploader.php'),
             __DIR__ . '/database/migrations/uploads.stub'           => database_path(sprintf('migrations/%s_create_uploads_table.php',          date('Y_m_d_His', time() + 1))),
             __DIR__ . '/database/migrations/upload_permits.stub'    => database_path(sprintf('migrations/%s_create_upload_permits_table.php',   date('Y_m_d_His', time() + 2))),
-        ], 'laravel-uploader');
+        ], ['pharaonic', 'laravel-uploader']);
 
         // Routes
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
+
+        // Loads
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 }
