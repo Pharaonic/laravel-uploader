@@ -7,6 +7,13 @@ use Pharaonic\Laravel\Uploader\File;
 use Pharaonic\Laravel\Uploader\Upload;
 use Pharaonic\Laravel\Uploader\UploadPermit;
 
+/**
+ * Uploaded File Controller
+ *
+ * @version 1.0
+ * @author Raggi <support@pharaonic.io>
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 class UploadController extends Controller
 {
     public function file(string $hash)

@@ -4,6 +4,13 @@ namespace Pharaonic\Laravel\Uploader;
 
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Reading File
+ *
+ * @version 1.0
+ * @author Raggi <support@pharaonic.io>
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 class File
 {
     private $file = null, $path = null, $mime = null, $stream = null, $buffer = 102400;

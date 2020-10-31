@@ -2,17 +2,21 @@
 
 namespace Pharaonic\Laravel\Uploader;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pharaonic\Laravel\Readable\Readable;
 
+/**
+ * Upload Model
+ *
+ * @version 1.0
+ * @author Raggi <support@pharaonic.io>
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 class Upload extends Model
 {
-    use HasFactory;
-
     /**
      * @var array
      */
