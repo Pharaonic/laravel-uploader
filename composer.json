@@ -2,18 +2,19 @@
     "name": "pharaonic/laravel-uploader",
     "description": "Laravel Uploader to upload files and handling visibility.",
     "keywords": [
-        "php",
-        "laravel",
+        "laravel uploader",
+        "laravel uploads",
+        "larave files",
         "uploader",
-        "files",
-        "secure"
+        "laravel",
+        "secure",
+        "php"
     ],
     "license": "MIT",
     "authors": [
         {
-            "name": "Raggi",
-            "email": "support@pharaonic.io",
-            "homepage": "https://pharaonic.io"
+            "name": "Moamen Eltouny (Raggi)",
+            "email": "raggi@raggitech.com"
         }
     ],
     "require": {
