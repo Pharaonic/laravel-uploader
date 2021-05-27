@@ -20,7 +20,8 @@
     "require": {
         "php": ">=7.2",
         "laravel/framework": ">=6.0",
-        "pharaonic/laravel-readable": ">=1.0"
+        "pharaonic/laravel-readable": ">=1.0",
+        "intervention/image": ">=2.5"
     },
     "config": {
         "sort-packages": true
