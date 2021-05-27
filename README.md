@@ -1,122 +1,31 @@
-<p align="center"><a href="https://pharaonic.io" target="_blank"><img src="https://raw.githubusercontent.com/Pharaonic/logos/main/uploader.jpg" width="470"></a></p>
+<p align="center"><a href="https://pharaonic.io" target="_blank"><img src="https://raw.githubusercontent.com/Pharaonic/logos/main/uploader.jpg"></a></p>
 
 <p align="center">
-<a href="https://github.com/Pharaonic/laravel-uploader" target="_blank"><img src="http://img.shields.io/badge/source-pharaonic/laravel--uploader-blue.svg?style=flat-square" alt="Source"></a> <a href="https://packagist.org/packages/pharaonic/laravel-uploader" target="_blank"><img src="https://img.shields.io/packagist/v/pharaonic/laravel-uploader?style=flat-square" alt="Packagist Version"></a><br>
-<a href="https://laravel.com" target="_blank"><img src="https://img.shields.io/badge/Laravel->=6.0-red.svg?style=flat-square" alt="Laravel"></a> <img src="https://img.shields.io/packagist/dt/pharaonic/laravel-uploader?style=flat-square" alt="Packagist Downloads"> <img src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="Source">
+  <a href="https://php.net" target="_blank"><img src="https://img.shields.io/static/v1?label=PHP&message=%3E=7.2&color=blue&style=flat-square" alt="PHP Version : >= 7.2"></a>
+  <a href="https://laravel.com" target="_blank"><img src="https://img.shields.io/static/v1?label=Laravel&message=%3E=6.0&color=F05340&style=flat-square" alt="Laravel Version : >= 6.0"></a>
+  <img src="https://img.shields.io/static/v1?label=License&message=MIT&color=brightgreen&style=flat-square" alt="License">
+  <a href="https://liberapay.com/Pharaonic" target="_blank"><img src="https://img.shields.io/liberapay/receives/Pharaonic?color=gold&label=Support&style=flat-square" alt="Support"></a>
+  <br>
+  <a href="https://packagist.org/packages/Pharaonic/laravel-uploader" target="_blank"><img src="https://img.shields.io/static/v1?label=Packagist&message=pharaonic/laravel-uploader&color=blue&logo=packagist&logoColor=white" alt="Source"></a>
+  <a href="https://packagist.org/packages/pharaonic/laravel-uploader" target="_blank"><img src="https://poser.pugx.org/pharaonic/laravel-uploader/v" alt="Packagist Version"></a>
+  <a href="https://packagist.org/packages/pharaonic/laravel-uploader" target="_blank"><img src="https://poser.pugx.org/pharaonic/laravel-uploader/downloads" alt="Packagist Downloads"></a>
 </p>
 
+<h3 align="center">Uploader provides a quick and easy methods to upload files and handling visibility with simple routing.</h3>
+<br>
 
-##### Laravel Uploader provides a quick and easy methods to upload files and handling visibility with simple routing.
+## Documentation
 
-###### 
+You can find the detailed documentation here in [Laravel Uploader Documentation](https://pharaonic.io/package/2-laravel/9-uploader).
 
+## Contributing
 
+Thank you for considering contributing to this package! Be one of Pharaonic team.
 
-## Install
+## Pharaonic Sponsors
 
-Install the latest version using [Composer](https://getcomposer.org/):
-
-```bash
-$ composer require pharaonic/laravel-uploader
-```
-
-then publish the migration & config files
-```bash
-$ php artisan vendor:publish --tag=laravel-uploader
-$ php artisan migrate
-```
-
-
-
-## Usage
-- [Configurations / Options](#config)
-- [Uploading & Getting](#UG)
-- [URL & Uploader](#URL_UP)
-- [Deleting](#dd)
-- [Permits (Private Files)](#permits)
-
-
-
-<a name="config"></a>
-
-#### Configurations / Options
-```php
-/**
-*	prefix 		=> Hash Prefix
-*	visitable	=> Visits Counter
-*	private		=> Only Permitted Users
-*/
-```
-
-
-
-<a name="UG"></a>
-
-#### Uploading & Getting
-###### function upload(UploadedFile $file, array $options = [])
-###### function getUpload(string $hash)
-
-```php
-// Upload File
-$file = upload($request->image, [
-	'visitable'	=> true
-]);
-
-// Getting Uploaded File with Hash code
-$file = getUploaded('5e63885fa771d1.12185481920ncF3...');
-
-// Information
-echo $file->hash; // File's Hash
-echo $file->name; // File's Name
-echo $file->path; // File's Path
-echo $file->size; // File's Size in Bytes
-echo $file->readableSize(); // File's Readable Size [B, KB, MB, ...] (1000)
-echo $file->readableSize(false); // File's Readable Size [B, KiB, MiB, ...] (1024)
-echo $file->extension; // File's Extension
-echo $file->mime; // File's MIME
-
-echo $file->visits; // File's visits (Visitable File)
-```
-
-
-
-<a name="URL_UP"></a>
-
-#### URL & Uploader
-
-```php
-echo $file->url; // Getting Uploaded File's URL
-// <img src"{{ $file->url }}" alt="{{ $file->name }}">
-
-$user = $file->uploader; // Getting Uploader's Model
-```
-
-
-
-<a name="dd"></a>
-
-#### Deleting Uploaded File
-```php
-$file->delete();
-```
-
-
-
-<a name="permits"></a>
-
-#### Permits (Private File)
-
-```php
-$permits = $file->permits; // Getting Permits List
-$permitted = $file->isPermitted($user); // Checking if permitted (App\User)
-
-$file->permit($user, '2021-02-01'); // Permitting a user
-$file->forbid($user); // Forbidding a user
-```
-
-
-
+We would like to extend our thanks to the following sponsors for funding Pharaonic packages development. If you are interested in becoming a sponsor, please visit the Pharaonic [Liberapay page](https://en.liberapay.com/Pharaonic) or [Patreon page](https://patreon.com/Pharaonic).
 
 ## License
 
-[MIT license](LICENSE.md)
+This package is an open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
