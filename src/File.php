@@ -13,13 +13,12 @@ use Illuminate\Support\Facades\Storage;
  */
 class File
 {
-    private $file = null, $path = null, $mime = null, $stream = null, $buffer = 102400;
+    private $path = null, $mime = null, $stream = null, $buffer = 102400;
     private $start  = -1, $end    = -1, $length = 0, $size   = 0;
 
 
     function __construct(Upload $file)
     {
-        $this->file = $file;
         $this->path = Storage::disk(config('Pharaonic.uploader.disk', 'public'))->path($file->path);
         $this->mime = $file->mime;
 
