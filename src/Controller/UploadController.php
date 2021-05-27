@@ -10,9 +10,8 @@ use Pharaonic\Laravel\Uploader\UploadPermit;
 /**
  * Uploaded File Controller
  *
- * @version 1.0
- * @author Raggi <support@pharaonic.io>
- * @license http://opensource.org/licenses/mit-license.php MIT License
+ * @version 2.0
+ * @author Moamen Eltouny (Raggi) <raggi@raggitech.com>
  */
 class UploadController extends Controller
 {

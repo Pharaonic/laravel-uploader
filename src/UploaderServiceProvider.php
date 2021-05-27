@@ -13,8 +13,15 @@ class UploaderServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // Load Migrations
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+
         // Config Merge
-        $this->mergeConfigFrom(__DIR__ . '/config/uploader.php', ['pharaonic', 'laravel-uploader']);
+        $this->mergeConfigFrom(__DIR__ . '/config/uploader.php', 'Pharaonic.uploader');
+
+        // Setting Default User Model
+        if (app()->version() > 7 && config('Pharaonic.uploader.user') == 'App\User')
+            config(['Pharaonic.uploader.user' => 'App\Models\User']);
     }
 
     /**
@@ -33,8 +40,5 @@ class UploaderServiceProvider extends ServiceProvider
 
         // Routes
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
-
-        // Loads
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
     }
 }

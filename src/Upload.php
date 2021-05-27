@@ -6,27 +6,34 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 use Pharaonic\Laravel\Readable\Readable;
 
 /**
  * Upload Model
  *
- * @version 1.0
- * @author Raggi <support@pharaonic.io>
- * @license http://opensource.org/licenses/mit-license.php MIT License
+ * @version 2.0
+ * @author Moamen Eltouny (Raggi) <raggi@raggitech.com>
  */
 class Upload extends Model
 {
     /**
+     * Fillable Columns
+     * 
      * @var array
      */
     protected $fillable = [
         'uploader_id',
         'hash', 'name', 'path', 'size', 'extension', 'mime',
         'visitable', 'visits',
-        'private'
+        'private', 'thumbnail_id'
     ];
 
+    /**
+     * Booting Upload
+     *
+     * @return void
+     */
     protected static function boot()
     {
         parent::boot();
@@ -45,7 +52,8 @@ class Upload extends Model
      */
     public static function upload(UploadedFile $file, array $options = [])
     {
-        $options = (object) array_merge(config('Pharaonic.uploader.options', []), $options);
+        $originalOptions = array_merge(config('Pharaonic.uploader.options', []), $options);
+        $options = (object) $originalOptions;
 
         $name       =   $file->getClientOriginalName();
         $hash       =   $file->hashName();
@@ -77,9 +85,43 @@ class Upload extends Model
         $plusName =  'raggi.' . Str::random(20);
         $file->storeAs($path, $hash . $plusName, config('Pharaonic.uploader.disk', 'public'));
 
-        // Delete Old File
-        if (isset($options->file)) {
+        // Thumbnail Generating
+        $thumbnail = null;
+        if (isset($options->thumbnail)) {
+            $ratio  = $options->thumbnail['ratio'] ?? false;
+            $width  = $options->thumbnail['width'] ?? null;
+            $height = $options->thumbnail['height'] ?? null;
 
+            if (!$width && !$height) throw new \Exception('You have to set width or height thumbnail\'s option.');
+
+            $thumbnail = Image::make($file);
+
+            // Ratio or Fixed
+            if ($ratio) {
+                $thumbnail->resize($width ?? null, $width > 0 ? null : $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            } else {
+                $thumbnail->resize($width, $height);
+            }
+
+            // Save Thumbnail before Upload it
+            $thumb_name = Str::random(37) . '.thumb';
+            Storage::disk('public')->put('pharaonic-thumbs/' . $thumb_name, $thumbnail->encode()->stream()->__toString());
+            $thumbnail = new UploadedFile(storage_path('app/public/pharaonic-thumbs/' . $thumb_name), $thumb_name, $thumbnail->mime());
+
+            // Upload Thumbnail
+            if (isset($originalOptions['thumbnail'])) unset($originalOptions['thumbnail']);
+            $originalOptions['directory'] = rtrim($originalOptions['directory'] ?? null, '/') . '/thumbnails';
+            $thumbnail = upload($thumbnail, $originalOptions)->id;
+
+            // Delete Fake File
+            Storage::disk(config('Pharaonic.uploader.disk', 'public'))->delete('pharaonic-thumbs/' . $thumb_name);
+        }
+
+        // Create / Update
+        if (isset($options->file)) {
+            // Delete Old File
             $options->file->deleteFile();
 
             $options->file->update([
@@ -91,11 +133,12 @@ class Upload extends Model
                 'size'          => $size,
                 'visitable'     => $options->visitable,
                 'private'       => $options->private,
+                'thumbnail_id'  => $thumbnail
             ]);
 
             return $options->file;
         } else {
-            return Upload::create([
+            $file = Upload::create([
                 'name'          => $name,
                 'hash'          => $hash,
                 'path'          => $path . DIRECTORY_SEPARATOR . $hash . $plusName,
@@ -104,16 +147,23 @@ class Upload extends Model
                 'size'          => $size,
                 'visitable'     => $options->visitable,
                 'private'       => $options->private,
+                'thumbnail_id'  => $thumbnail,
                 'uploader_id'   => auth()->check() ? auth()->user()->id : null
             ]);
+
+            return $file;
         }
     }
 
     /**
-     * Delete File
+     * Deleting File && Thumbnail
+     *
+     * @return boolean
      */
     public function deleteFile()
     {
+        if ($this->thumbnail_id) $this->thumbnail->delete();
+
         return Storage::disk(config('Pharaonic.uploader.disk', 'public'))->delete($this->path);
     }
 
@@ -128,7 +178,9 @@ class Upload extends Model
     }
 
     /**
-     * Get Url
+     * Getting URL
+     *
+     * @return string
      */
     public function getUrlAttribute()
     {
@@ -136,6 +188,18 @@ class Upload extends Model
     }
 
     /**
+     * Getting Thumbnail Object
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function thumbnail()
+    {
+        return $this->hasOne(self::class, 'id', 'thumbnail_id');
+    }
+
+    /**
+     * Getting Uploader Object
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function uploader()
@@ -144,6 +208,8 @@ class Upload extends Model
     }
 
     /**
+     * Getting Permits
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function permits()
@@ -153,6 +219,9 @@ class Upload extends Model
 
     /**
      * Is Permitted?
+     *
+     * @param Model $user
+     * @return boolean
      */
     public function isPermitted(Model $user)
     {
@@ -164,6 +233,10 @@ class Upload extends Model
 
     /**
      * Permit for a Private File
+     *
+     * @param Model $user
+     * @param $expiration
+     * @return Model|boolean
      */
     public function permit(Model $user, $expiration = null)
     {
@@ -189,6 +262,9 @@ class Upload extends Model
 
     /**
      * Forbid for a Private File
+     *
+     * @param Model $user
+     * @return void
      */
     public function forbid(Model $user)
     {

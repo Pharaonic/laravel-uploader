@@ -26,7 +26,8 @@ class CreateUploadsTable extends Migration
             $table->boolean('visitable')->default(false);
             $table->unsignedBigInteger('visits')->default(0);
             $table->boolean('private')->default(false);
-
+            
+            $table->unsignedBigInteger('thumbnail_id')->nullable();
             $table->unsignedBigInteger('uploader_id')->nullable();
 
             $table->timestamps();

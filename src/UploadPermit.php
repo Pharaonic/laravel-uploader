@@ -8,9 +8,8 @@ use Illuminate\Support\Carbon;
 /**
  * Uploaded File Permissions Model
  *
- * @version 1.0
- * @author Raggi <support@pharaonic.io>
- * @license http://opensource.org/licenses/mit-license.php MIT License
+ * @version 2.0
+ * @author Moamen Eltouny (Raggi) <raggi@raggitech.com>
  */
 class UploadPermit extends Model
 {
@@ -38,6 +37,8 @@ class UploadPermit extends Model
     }
 
     /**
+     * Getting User Object
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user()
@@ -46,6 +47,8 @@ class UploadPermit extends Model
     }
 
     /**
+     * Getting File Object
+     * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function file()
@@ -55,6 +58,8 @@ class UploadPermit extends Model
 
     /**
      * Check is Expired
+     *
+     * @return boolean
      */
     public function isExpired()
     {
