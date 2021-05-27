@@ -4,6 +4,7 @@ namespace Pharaonic\Laravel\Uploader;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -91,7 +92,6 @@ class Upload extends Model
             $ratio  = $options->thumbnail['ratio'] ?? false;
             $width  = $options->thumbnail['width'] ?? null;
             $height = $options->thumbnail['height'] ?? null;
-
             if (!$width && !$height) throw new \Exception('You have to set width or height thumbnail\'s option.');
 
             $thumbnail = Image::make($file);
@@ -106,22 +106,27 @@ class Upload extends Model
             }
 
             // Save Thumbnail before Upload it
-            $thumb_name = Str::random(37) . '.thumb';
-            Storage::disk('public')->put('pharaonic-thumbs/' . $thumb_name, $thumbnail->encode()->stream()->__toString());
+            $thumb_name = Str::random(37) . '.' . $extension;
+            if (!File::isDirectory(storage_path('app/public/pharaonic-thumbs'))) File::makeDirectory(storage_path('app/public/pharaonic-thumbs'));
+            $thumbnail->save(storage_path('app/public/pharaonic-thumbs/' . $thumb_name), 100);
+
             $thumbnail = new UploadedFile(storage_path('app/public/pharaonic-thumbs/' . $thumb_name), $thumb_name, $thumbnail->mime());
 
             // Upload Thumbnail
             if (isset($originalOptions['thumbnail'])) unset($originalOptions['thumbnail']);
+            if (isset($originalOptions['file'])) unset($originalOptions['file']);
             $originalOptions['directory'] = rtrim($originalOptions['directory'] ?? null, '/') . '/thumbnails';
             $thumbnail = upload($thumbnail, $originalOptions)->id;
 
             // Delete Fake File
             Storage::disk(config('Pharaonic.uploader.disk', 'public'))->delete('pharaonic-thumbs/' . $thumb_name);
+
         }
 
         // Create / Update
         if (isset($options->file)) {
-            // Delete Old File
+            // Delete Old Files
+            if ($options->file->thumbnail_id > 0) $options->file->thumbnail->delete();
             $options->file->deleteFile();
 
             $options->file->update([
@@ -162,8 +167,6 @@ class Upload extends Model
      */
     public function deleteFile()
     {
-        if ($this->thumbnail_id) $this->thumbnail->delete();
-
         return Storage::disk(config('Pharaonic.uploader.disk', 'public'))->delete($this->path);
     }
 
