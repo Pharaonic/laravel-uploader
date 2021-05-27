@@ -33,9 +33,9 @@ class UploaderServiceProvider extends ServiceProvider
     {
         // Publishes
         $this->publishes([
-            __DIR__ . '/config/uploader.php'                        => config_path('Pharaonic/uploader.php'),
-            __DIR__ . '/database/migrations/uploads.stub'           => database_path(sprintf('migrations/%s_create_uploads_table.php',          date('Y_m_d_His', time() + 1))),
-            __DIR__ . '/database/migrations/upload_permits.stub'    => database_path(sprintf('migrations/%s_create_upload_permits_table.php',   date('Y_m_d_His', time() + 2))),
+            __DIR__ . '/config/uploader.php'                                            => config_path('Pharaonic/uploader.php'),
+            __DIR__ . '/database/migrations/2021_02_01_000001_create_uploads_table.php' => database_path('migrations/2021_02_01_000001_create_uploads_table.php'),
+            __DIR__ . '/database/migrations/2021_02_01_000002_upload_permits_table.php' => database_path('migrations/2021_02_01_000002_upload_permits_table.php'),
         ], ['pharaonic', 'laravel-uploader']);
 
         // Routes
