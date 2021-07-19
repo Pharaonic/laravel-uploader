@@ -21,7 +21,7 @@
         "php": ">=7.2",
         "laravel/framework": ">=6.0",
         "pharaonic/laravel-readable": ">=1.0",
-        "intervention/image": ">=2.5"
+        "intervention/image": "dev-master"
     },
     "config": {
         "sort-packages": true
