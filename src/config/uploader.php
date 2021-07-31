@@ -22,6 +22,12 @@ return [
     'user'  => \App\User::class,
 
     /**
+     * Contoller Class for handling permissions
+     * Allow custom controllers.
+     */
+    'controller'  => \Pharaonic\Laravel\Uploader\Controller\UploadController::class,
+
+    /**
      * Default Options
      */
     'options'   => [

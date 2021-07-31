@@ -26,9 +26,12 @@ class UploadController extends Controller
         if ($file->private) {
             if (!auth()->check()) return abort(404);
 
-            $isPermitted = UploadPermit::where('user_id', auth()->user()->id)->where('upload_id', $file->id)->first();
-            if (!$isPermitted) return abort(404);
-            if ($isPermitted->isExpired()) return abort(404);
+            // If the viewer isn't the owner or uploader, check if the user has permission to view the file.
+            if ( auth()->user()->id != $file->uploader_id ) {
+                $isPermitted = UploadPermit::where('user_id', auth()->user()->id)->where('upload_id', $file->id)->first();
+                if (!$isPermitted) return abort(404);
+                if ($isPermitted->isExpired()) return abort(404);
+            }
         }
 
         // Stream the File
