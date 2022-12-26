@@ -187,7 +187,12 @@ class Upload extends Model
      */
     public function getUrlAttribute()
     {
-        return route('uploaded', $this->hash);
+        if (!in_array(config('Pharaonic.uploader.disk'), ['local', 'public'])) {
+            $driver = Storage::disk(config('Pharaonic.uploader.disk'));
+            return $driver->providesTemporaryUrls() ? $driver->temporaryUrl($this->path, now()->addMinutes(config('Pharaonic.uploader.expire', 5))) : $driver->url($this->path);
+        } else {
+            return route('uploaded', $this->hash);
+        }
     }
 
     /**
