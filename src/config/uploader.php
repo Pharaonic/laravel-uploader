@@ -28,6 +28,11 @@ return [
     'controller'  => \Pharaonic\Laravel\Uploader\Controller\UploadController::class,
 
     /**
+     * Expiry time of temporary-url in minutes
+     */
+    'expire' => 5,
+
+    /**
      * Default Options
      */
     'options'   => [
