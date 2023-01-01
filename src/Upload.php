@@ -55,7 +55,7 @@ class Upload extends Model
     {
         $originalOptions = array_merge(config('Pharaonic.uploader.options', []), $options);
         $options = (object) $originalOptions;
-        
+
         $disk = $options->disk ?? config('Pharaonic.uploader.disk', 'public');
         $name = $file->getClientOriginalName();
         $hash = $file->hashName();
@@ -121,7 +121,6 @@ class Upload extends Model
 
             // Delete Fake File
             Storage::disk($disk)->delete('pharaonic-thumbs/' . $thumb_name);
-
         }
 
         // Create / Update
@@ -170,6 +169,9 @@ class Upload extends Model
      */
     public function deleteFile()
     {
+        if (!Storage::disk($this->getDisk())->exists($this->path))
+            return false;
+
         return Storage::disk($this->getDisk())->delete($this->path);
     }
 
