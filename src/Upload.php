@@ -25,7 +25,7 @@ class Upload extends Model
      */
     protected $fillable = [
         'uploader_id',
-        'hash', 'name', 'path', 'size', 'extension', 'mime',
+        'hash', 'name', 'path', 'size', 'extension', 'mime', 'disk',
         'visitable', 'visits',
         'private', 'thumbnail_id'
     ];
@@ -56,15 +56,16 @@ class Upload extends Model
         $originalOptions = array_merge(config('Pharaonic.uploader.options', []), $options);
         $options = (object) $originalOptions;
 
-        $name       =   $file->getClientOriginalName();
-        $hash       =   $file->hashName();
+        $disk = $options['disk'] ?? config('Pharaonic.uploader.disk', 'public');
+        $name = $file->getClientOriginalName();
+        $hash = $file->hashName();
         if (strpos($hash, '.') !== false) {
             $hash = explode('.', $hash);
             unset($hash[count($hash) - 1]);
             $hash = implode('', $hash);
         }
 
-        $hash       =   uniqid(config('Pharaonic.uploader.options.prefix', ''), true) . Str::random(7)  . '-' . $hash;
+        $hash = uniqid(config('Pharaonic.uploader.options.prefix', ''), true) . Str::random(7)  . '-' . $hash;
 
         if (strpos($name, '.') !== false) {
             $ext = explode('.', $name);
@@ -84,7 +85,7 @@ class Upload extends Model
 
         // Save File
         $plusName =  'raggi.' . Str::random(20);
-        $file->storeAs($path, $hash . $plusName, config('Pharaonic.uploader.disk', 'public'));
+        $file->storeAs($path, $hash . $plusName, $disk);
 
         // Thumbnail Generating
         $thumbnail = null;
@@ -119,7 +120,7 @@ class Upload extends Model
             $thumbnail = upload($thumbnail, $originalOptions)->id;
 
             // Delete Fake File
-            Storage::disk(config('Pharaonic.uploader.disk', 'public'))->delete('pharaonic-thumbs/' . $thumb_name);
+            Storage::disk($disk)->delete('pharaonic-thumbs/' . $thumb_name);
 
         }
 
@@ -167,7 +168,7 @@ class Upload extends Model
      */
     public function deleteFile()
     {
-        return Storage::disk(config('Pharaonic.uploader.disk', 'public'))->delete($this->path);
+        return Storage::disk($this->getDisk())->delete($this->path);
     }
 
     /**
@@ -181,14 +182,24 @@ class Upload extends Model
     }
 
     /**
+     * Get uploading disk
+     *
+     * @return string
+     */
+    protected function getDisk()
+    {
+        return $this->disk ?? config('Pharaonic.uploader.disk', 'public');
+    }
+
+    /**
      * Getting URL
      *
      * @return string
      */
     public function getUrlAttribute()
     {
-        if (!in_array(config('Pharaonic.uploader.disk'), ['local', 'public'])) {
-            $driver = Storage::disk(config('Pharaonic.uploader.disk'));
+        if (!in_array($this->getDisk(), ['local', 'public'])) {
+            $driver = Storage::disk($this->getDisk());
             return $driver->providesTemporaryUrls() ? $driver->temporaryUrl($this->path, now()->addMinutes(config('Pharaonic.uploader.expire', 5))) : $driver->url($this->path);
         } else {
             return route('uploaded', $this->hash);

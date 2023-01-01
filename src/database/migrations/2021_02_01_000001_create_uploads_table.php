@@ -22,6 +22,7 @@ class CreateUploadsTable extends Migration
             $table->bigInteger('size');
             $table->string('extension', 20);
             $table->string('mime', 50);
+            $table->string('disk')->nullable();
             
             $table->boolean('visitable')->default(false);
             $table->unsignedBigInteger('visits')->default(0);
