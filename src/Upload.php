@@ -55,8 +55,8 @@ class Upload extends Model
     {
         $originalOptions = array_merge(config('Pharaonic.uploader.options', []), $options);
         $options = (object) $originalOptions;
-
-        $disk = $options['disk'] ?? config('Pharaonic.uploader.disk', 'public');
+        
+        $disk = $options->disk ?? config('Pharaonic.uploader.disk', 'public');
         $name = $file->getClientOriginalName();
         $hash = $file->hashName();
         if (strpos($hash, '.') !== false) {
@@ -134,6 +134,7 @@ class Upload extends Model
                 'name'          => $name,
                 'hash'          => $hash,
                 'path'          => $path . DIRECTORY_SEPARATOR . $hash . $plusName,
+                'disk'          => $disk,
                 'extension'     => $extension,
                 'mime'          => $mime,
                 'size'          => $size,
@@ -148,6 +149,7 @@ class Upload extends Model
                 'name'          => $name,
                 'hash'          => $hash,
                 'path'          => $path . DIRECTORY_SEPARATOR . $hash . $plusName,
+                'disk'          => $disk,
                 'extension'     => $extension,
                 'mime'          => $mime,
                 'size'          => $size,
