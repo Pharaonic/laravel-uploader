@@ -204,7 +204,11 @@ class Upload extends Model
     {
         if (!in_array($this->getDisk(), ['local', 'public'])) {
             $driver = Storage::disk($this->getDisk());
-            return $driver->providesTemporaryUrls() ? $driver->temporaryUrl($this->path, now()->addMinutes(config('Pharaonic.uploader.expire', 5))) : $driver->url($this->path);
+            return $driver->providesTemporaryUrls() ? $driver->temporaryUrl(
+                $this->path,
+                now()->addMinutes(config('Pharaonic.uploader.expire', 5)),
+                ['ResponseContentDisposition' => 'filename="' . $this->name . '"']
+            ) : $driver->url($this->path);
         } else {
             return route('uploaded', $this->hash);
         }
