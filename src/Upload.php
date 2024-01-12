@@ -13,7 +13,7 @@ use Pharaonic\Laravel\Readable\Readable;
 /**
  * Upload Model
  *
- * @version 2.0
+ * @version 3.0
  * @author Moamen Eltouny (Raggi) <raggi@raggitech.com>
  */
 class Upload extends Model
