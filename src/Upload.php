@@ -85,7 +85,10 @@ class Upload extends Model
 
         // Save File
         $plusName =  'raggi.' . Str::random(20);
-        $file->storeAs($path, $hash . $plusName, $disk);
+        $file->storeAs($path, $hash . $plusName, [
+            'disk' => $disk,
+            'visibility' => $options->private ? 'private' : 'public',
+        ]);
 
         // Thumbnail Generating
         $thumbnail = null;
@@ -196,26 +199,55 @@ class Upload extends Model
     }
 
     /**
-     * Getting URL
+     * Getting URL.
      *
      * @return string
      */
-    public function url(int $expire = null)
+    public function url()
     {
-        if (!in_array($this->getDisk(), ['local', 'public'])) {
-            $driver = Storage::disk($this->getDisk());
-            return $driver->providesTemporaryUrls() ? $driver->temporaryUrl(
-                $this->path,
-                now()->addMinutes($expire ?? config('Pharaonic.uploader.expire', 5)),
-                ['ResponseContentDisposition' => 'filename="' . $this->name . '"']
-            ) : $driver->url($this->path);
-        } else {
+        if (config('filesystems.disks.' . $this->getDisk() . '.driver') == 'local') {
             return route('uploaded', $this->hash);
         }
+
+        if ($this->private && Storage::disk($this->getDisk())->providesTemporaryUrls()) {
+            return $this->temporaryUrl();
+        }
+
+        return Storage::disk($this->getDisk())->url($this->path);
     }
 
     /**
-     * Getting URL Shortcut
+     * Getting Temporary URL.
+     *
+     * @return string
+     */
+    public function temporaryUrl(int $expire = null)
+    {
+        $driver = Storage::disk($this->getDisk());
+
+        if (!$driver->providesTemporaryUrls()) {
+            throw new \Exception('The driver ' . $this->getDisk() . ' does not support temporary URLs.');
+        }
+
+        return $driver->temporaryUrl(
+            $this->path,
+            now()->addMinutes($expire ?? config('Pharaonic.uploader.expire', 5)),
+            ['ResponseContentDisposition' => 'filename="' . $this->name . '"']
+        );
+    }
+
+    /**
+     * Getting Temporary URL.
+     *
+     * @return string
+     */
+    public function getTemporaryUrlAttribute()
+    {
+        return $this->temporaryUrl();
+    }
+
+    /**
+     * Getting URL.
      *
      * @return string
      */
@@ -232,6 +264,58 @@ class Upload extends Model
     public function thumbnail()
     {
         return $this->hasOne(self::class, 'id', 'thumbnail_id');
+    }
+
+    /**
+     * Getting File Visibility.
+     *
+     * @return string
+     */
+    public function getVisibilityAttribute()
+    {
+        return !$this->private ? 'public' : 'private';
+    }
+
+    /**
+     * Check if File is Public
+     *
+     * @return boolean
+     */
+    public function isPublic()
+    {
+        return !$this->private;
+    }
+
+    /**
+     * Check if File is Private
+     *
+     * @return boolean
+     */
+    public function isPrivate()
+    {
+        return $this->private;
+    }
+
+    /**
+     * Set File as Public
+     *
+     * @return void
+     */
+    public function setAsPublic()
+    {
+        $this->update(['private' => false]);
+        Storage::disk($this->getDisk())->setVisibility($this->path, 'public');
+    }
+
+    /**
+     * Set File as Private
+     *
+     * @return void
+     */
+    public function setAsPrivate()
+    {
+        $this->update(['private' => true]);
+        Storage::disk($this->getDisk())->setVisibility($this->path, 'private');
     }
 
     /**
