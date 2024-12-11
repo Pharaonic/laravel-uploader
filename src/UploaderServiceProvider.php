@@ -16,8 +16,6 @@ class UploaderServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('pharaonic.uploader', fn() => new Classes\Uploader);
-
         // Load Migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
@@ -26,6 +24,9 @@ class UploaderServiceProvider extends ServiceProvider
             __DIR__ . '/../config/uploader.php',
             'Pharaonic.uploader'
         );
+
+        // Create Uploader Instance
+        $this->app->singleton('pharaonic.uploader', fn() => new Classes\Uploader);
     }
 
     /**

@@ -32,10 +32,7 @@ class Router
      */
     public function action()
     {
-        return [
-            $this->options['controller'],
-            'file'
-        ];
+        return $this->options['controller'];
     }
 
     /**
