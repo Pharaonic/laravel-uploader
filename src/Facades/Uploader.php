@@ -5,9 +5,9 @@ namespace Pharaonic\Laravel\Uploader\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static array options()
- * @method static Router route()
- * @method static \Pharaonic\Laravel\Uploader\Models\Upload upload(\Illuminate\Http\UploadedFile|string $file, array $options = [])
+ * @method static array options() Get uploader options.
+ * @method static Router route() Create a new Router instance.
+ * @method static \Pharaonic\Laravel\Uploader\Models\Upload upload(\Illuminate\Http\UploadedFile|string $file, array $options = []) Upload a new file.
  */
 class Uploader extends Facade
 {

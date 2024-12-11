@@ -5,9 +5,9 @@ namespace Pharaonic\Laravel\Uploader\Classes;
 use Illuminate\Http\UploadedFile;
 
 /**
- * @method array options()
- * @method Router route()
- * @method 
+ * @method array options() Get uploader options.
+ * @method Router route() Create a new Router instance.
+ * @method \Pharaonic\Laravel\Uploader\Models\Upload upload(\Illuminate\Http\UploadedFile|string $file, array $options = []) Upload a new file.
  */
 class Uploader
 {
