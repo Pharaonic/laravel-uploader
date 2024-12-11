@@ -3,6 +3,7 @@
 namespace Pharaonic\Laravel\Uploader\Classes;
 
 use Illuminate\Http\UploadedFile;
+use Pharaonic\Laravel\Uploader\Actions\CreateFile;
 
 /**
  * @method array options() Get uploader options.
@@ -51,8 +52,8 @@ class Uploader
      *
      * @param UploadedFile|string $file
      * @param array|null $options
-     * 
      * @return \Pharaonic\Laravel\Uploader\Models\Upload
+     * 
      * @throws \Exception if the file path does not exist.
      */
     public function upload(UploadedFile|string $file, array $options = [])
@@ -70,6 +71,6 @@ class Uploader
             );
         }
 
-        // todo: create action
+        return (new CreateFile)->handle($file, $options);
     }
 }
