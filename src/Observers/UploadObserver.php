@@ -3,6 +3,7 @@
 namespace Pharaonic\Laravel\Uploader\Observers;
 
 use Illuminate\Support\Facades\Storage;
+use Pharaonic\Laravel\Uploader\Actions\DeleteFile;
 use Pharaonic\Laravel\Uploader\Models\Upload;
 
 class UploadObserver
@@ -23,15 +24,11 @@ class UploadObserver
     /**
      * Handle the Upload "deleting" event.
      *
-     * @param  Upload  $file
+     * @param  Upload  $upload
      * @return void
      */
-    public function deleting(Upload $file)
+    public function deleting(Upload $upload)
     {
-        if ($file->thumbnail_id) {
-            $file->thumbnail->delete();
-        }
-
-        // todo: delete action
+        (new DeleteFile)->handle($upload);
     }
 }

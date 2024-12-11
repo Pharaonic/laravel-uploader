@@ -10,8 +10,8 @@ if (!function_exists('upload')) {
      *
      * @param UploadedFile|string $file
      * @param array $options
-     * 
      * @return Pharaonic\Laravel\Uploader\Upload
+     * 
      * @throws Exception if the file path does not exist.
      */
     function upload(UploadedFile|string $file, array $options = [])
@@ -25,8 +25,8 @@ if (!function_exists('uploaded')) {
      * Get the uploaded file.
      *
      * @param string $hash
-     * 
      * @return Pharaonic\Laravel\Uploader\Upload
+     * 
      * @throws Illuminate\Database\Eloquent\ModelNotFoundException
      */
     function uploaded(string $hash)

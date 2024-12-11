@@ -8,14 +8,14 @@ trait Visibility
      * Set Visibility
      *
      * @param string $visibility
-     * @return $this
+     * @return static
      */
     public function visibility(string $visibility)
     {
         if (config('filesystems.disks.' . $this->disk . '.driver') == 'local') {
             throw new \Exception('Visibility is only available for S3.');
         }
-        
+
         $this->visibility = $visibility;
 
         return $this;
@@ -24,7 +24,7 @@ trait Visibility
     /**
      * Set Visibility to Public
      *
-     * @return $this
+     * @return static
      */
     public function public()
     {
@@ -34,7 +34,7 @@ trait Visibility
     /**
      * Set Visibility to Private
      *
-     * @return $this
+     * @return static
      */
     public function private()
     {
