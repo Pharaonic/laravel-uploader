@@ -2,6 +2,7 @@
 
 namespace Pharaonic\Laravel\Uploader;
 
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\ServiceProvider;
 use Pharaonic\Laravel\Uploader\Models\Upload;
 use Pharaonic\Laravel\Uploader\Observers\UploadObserver;
@@ -34,6 +35,9 @@ class UploaderServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //  Information
+        AboutCommand::add('Pharaonic', fn () => ['Uploader' => '4.0.0']);
+
         // Observers
         Upload::observe(UploadObserver::class);
 
