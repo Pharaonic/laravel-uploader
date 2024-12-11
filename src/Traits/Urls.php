@@ -11,7 +11,7 @@ trait Urls
      */
     public function url()
     {
-        // 
+        
     }
 
     /**
