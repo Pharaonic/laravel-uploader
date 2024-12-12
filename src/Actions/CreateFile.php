@@ -131,7 +131,7 @@ class CreateFile
         $file = $this->handle(
             new UploadedFile(
                 storage_path('app/public/pharaonic-thumbs/' . $name),
-                $name,
+                $file->getClientOriginalName() . '-thumbnail',
                 $thumbnail->mime()
             ),
             $options
