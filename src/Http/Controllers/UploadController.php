@@ -16,7 +16,10 @@ class UploadController
     public function __invoke(string $hash)
     {
         if (Uploader::options()['extensional'] && str_contains($hash, '.')) {
-            $hash = explode('.', $hash)[0];
+            $hash = explode('.', $hash);
+            unset($hash[count($hash) - 1]);
+
+            $hash = implode('.', $hash);
         }
 
         abort_if(
