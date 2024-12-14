@@ -37,7 +37,7 @@ class UploaderServiceProvider extends ServiceProvider
     public function boot()
     {
         //  Information
-        AboutCommand::add('Pharaonic', fn () => ['Uploader' => '4.0.0']);
+        AboutCommand::add('Pharaonic', fn () => ['Uploader' => '4.x']);
 
         // Observers
         Upload::observe(UploadObserver::class);
