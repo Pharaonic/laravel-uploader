@@ -24,8 +24,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('path');
             $table->unsignedBigInteger('size');
-            $table->string('extension', 25);
-            $table->string('mime', 70);
+            $table->string('extension');
+            $table->string('mime');
 
             $table->timestamps();
         });
