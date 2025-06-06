@@ -84,4 +84,29 @@ class Upload extends Model
     {
         return $this->hasOne(static::class, 'id', 'thumbnail_id');
     }
+
+    /**
+     * Get the file URL or other information based on the target.
+     *
+     * @param string $target
+     * @param bool $isTemporary
+     * @param int|null $expire
+     * @return string|array|null
+     */
+    public function info(string $target = 'url', bool $isTemporary = false, int $expire = null)
+    {
+        if ($target == 'url') {
+            return $isTemporary
+                ? $this->temporaryUrl($expire)
+                : $this->url;
+        }
+
+        return $this->only('id', 'name', 'extension', 'mime') + [
+            'size' => $this->size(),
+            'url' => $isTemporary
+                ? $this->temporaryUrl($expire)
+                : $this->url,
+            'content' => in_array($this->extension, ['svg']) ? Storage::disk($this->disk)->get($this->path) : null,
+        ];
+    }
 }
