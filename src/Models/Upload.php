@@ -3,6 +3,7 @@
 namespace Pharaonic\Laravel\Uploader\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Pharaonic\Laravel\Uploader\Traits\Urls;
 use Pharaonic\Laravel\Uploader\Traits\Visibility;
 
