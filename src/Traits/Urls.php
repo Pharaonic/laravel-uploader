@@ -41,7 +41,7 @@ trait Urls
             );
         }
 
-        if ($this->visibility && Storage::disk($this->disk)->providesTemporaryUrls()) {
+        if ($this->visibility == 'private' && Storage::disk($this->disk)->providesTemporaryUrls()) {
             return $this->temporaryUrl();
         }
 
