@@ -9,8 +9,9 @@ use Pharaonic\Laravel\Uploader\Traits\Visibility;
 
 /**
  * Upload Model
- * 
+ *
  * @version 4.0
+ *
  * @author Moamen Eltouny (Raggi) <raggigroup@gmail.com>
  *
  * @property int $id
@@ -28,6 +29,7 @@ use Pharaonic\Laravel\Uploader\Traits\Visibility;
  * @property-read \Carbon\Carbon $created_at
  * @property-read \Carbon\Carbon $updated_at
  * @property-read Upload|null $thumbnail
+ *
  * @method string size(bool $decimal = true)
  * @method Upload visibility(string $visibility)
  * @method Upload public()
@@ -37,12 +39,12 @@ use Pharaonic\Laravel\Uploader\Traits\Visibility;
  */
 class Upload extends Model
 {
-    use Visibility;
     use Urls;
+    use Visibility;
 
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * @var array
      */
     protected $fillable = [
@@ -69,7 +71,7 @@ class Upload extends Model
     /**
      * Get readable size.
      *
-     * @var bool $decimal
+     * @var bool
      */
     public function size(bool $decimal = true)
     {
@@ -89,12 +91,9 @@ class Upload extends Model
     /**
      * Get the file URL or other information based on the target.
      *
-     * @param string $target
-     * @param bool $isTemporary
-     * @param int|null $expire
      * @return string|array|null
      */
-    public function info(string $target = 'url', bool $isTemporary = false, int $expire = null)
+    public function info(string $target = 'url', bool $isTemporary = false, ?int $expire = null)
     {
         if ($target == 'url') {
             return $isTemporary
@@ -102,12 +101,17 @@ class Upload extends Model
                 : $this->url;
         }
 
+        $url = $isTemporary ? $this->temporaryUrl($expire) : $this->url;
+        $content = in_array($this->extension, ['svg']) ? Storage::disk($this->disk)->get($this->path) : null;
+        $thumbnail = $this->relationLoaded('thumbnail') && $this->thumbnail ?
+            $this->thumbnail->info($target, $isTemporary, $expire) :
+            null;
+
         return $this->only('id', 'name', 'extension', 'mime') + [
             'size' => $this->size(),
-            'url' => $isTemporary
-                ? $this->temporaryUrl($expire)
-                : $this->url,
-            'content' => in_array($this->extension, ['svg']) ? Storage::disk($this->disk)->get($this->path) : null,
+            'url' => $url,
+            'content' => $content,
+            'thumbnail' => $thumbnail,
         ];
     }
 }
