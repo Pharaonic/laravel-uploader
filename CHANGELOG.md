@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## 6.0.0 - Unreleased
+## 7.0.0 - Unreleased
+
+`7.x` supports Laravel 7 on PHP 8.0.
+
+### Compatibility
+
+- Laravel 7.30+ on PHP 8.0.
+- Requires `pharaonic/laravel-readable` `^7.0`.
+- The same API, configuration, route, migrations and behavior as 6.0.0, including the deprecated `Pharaonic.uploader` key.
+
+## 6.0.0 - 2026-10-28
 
 The first release of the per-Laravel-major lines. `6.x` supports Laravel 6 on PHP 8.0.
 
