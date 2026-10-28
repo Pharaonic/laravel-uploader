@@ -26,22 +26,22 @@
         "source": "https://github.com/Pharaonic/laravel-uploader"
     },
     "require": {
-        "php": ">=8.1 <8.4",
-        "illuminate/contracts": "^10.0",
-        "illuminate/database": "^10.0",
-        "illuminate/filesystem": "^10.0",
-        "illuminate/http": "^10.0",
-        "illuminate/routing": "^10.0",
-        "illuminate/support": "^10.0",
+        "php": ">=8.2 <8.5",
+        "illuminate/contracts": "^11.0",
+        "illuminate/database": "^11.0",
+        "illuminate/filesystem": "^11.0",
+        "illuminate/http": "^11.0",
+        "illuminate/routing": "^11.0",
+        "illuminate/support": "^11.0",
         "intervention/image": "^2.7",
-        "pharaonic/laravel-readable": "^10.0"
+        "pharaonic/laravel-readable": "^11.0"
     },
     "require-dev": {
         "laravel/pint": "^1.20",
-        "orchestra/testbench": "^8.0",
-        "pestphp/pest": "^1.23",
+        "orchestra/testbench": "^9.0",
+        "pestphp/pest": "^3.8",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^9.6.33"
+        "phpunit/phpunit": "^11.5.50"
     },
     "suggest": {
         "ext-gd": "Required by Intervention Image to generate thumbnails, unless ext-imagick is configured.",
@@ -92,7 +92,7 @@
             "advisories": {
                 "block": false,
                 "ignore": {
-                    "laravel/framework": "No fixed release within Laravel 10; the application chooses the framework release."
+                    "laravel/framework": "No fixed release within Laravel 11; the application chooses the framework release."
                 }
             }
         },
