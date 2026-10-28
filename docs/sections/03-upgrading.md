@@ -1,6 +1,6 @@
 ## Upgrading from 4.x
 
-The `9.x` line runs on Laravel 9 with PHP 8.0, 8.1 or 8.2. Most applications upgrade without code changes; check the points below.
+The `10.x` line runs on Laravel 10 with PHP 8.1, 8.2 or 8.3. Most applications upgrade without code changes; check the points below.
 
 ### Database
 
