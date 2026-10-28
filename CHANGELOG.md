@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.0.0 - Unreleased
+
+`8.x` supports Laravel 8 on PHP 8.0 and 8.1.
+
+### Compatibility
+
+- Laravel 8.75+ on PHP 8.0 or 8.1.
+- Requires `pharaonic/laravel-readable` `^8.0`.
+- The same API, configuration, route, migrations and behavior as 7.0.0, including the deprecated `Pharaonic.uploader` key.
+
 ## 7.0.0 - Unreleased
 
 `7.x` supports Laravel 7 on PHP 8.0.
