@@ -34,7 +34,7 @@ body:
     id: package-version
     attributes:
       label: Package version
-      placeholder: "e.g. 9.0.0"
+      placeholder: "e.g. 10.0.0"
     validations:
       required: true
 
@@ -42,7 +42,7 @@ body:
     id: php-version
     attributes:
       label: PHP version
-      placeholder: "e.g. 8.2.30"
+      placeholder: "e.g. 8.3.35"
     validations:
       required: true
 
@@ -50,7 +50,7 @@ body:
     id: laravel-version
     attributes:
       label: Laravel version
-      placeholder: "e.g. 9.52.22"
+      placeholder: "e.g. 10.50.4"
     validations:
       required: true
 
