@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.1.0 - Unreleased
+
+### Changed
+
+- Behavior change from 6.0.x: a thumbnail's `name` puts `-thumbnail` before the extension and ends with the thumbnail's own extension (`photo-thumbnail.jpg` instead of `photo.jpg-thumbnail`), so the file route's `Content-Disposition` filename keeps a usable extension. Thumbnails stored before keep their name.
+
 ## 6.0.0 - 2026-10-28
 
 The first release of the per-Laravel-major lines. `6.x` supports Laravel 6 on PHP 8.0.
