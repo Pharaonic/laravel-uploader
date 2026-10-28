@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 10.0.0 - Unreleased
+
+`10.x` supports Laravel 10 on PHP 8.1, 8.2 and 8.3.
+
+### Compatibility
+
+- Laravel 10.0+ on PHP 8.1, 8.2 or 8.3. PHP 8.0 is no longer supported on this line.
+- Requires `pharaonic/laravel-readable` `^10.0`.
+- The same API, configuration, route, migrations and behavior as 9.0.0, including the deprecated `Pharaonic.uploader` key.
+
 ## 9.0.0 - 2026-10-28
 
 `9.x` supports Laravel 9 on PHP 8.0, 8.1 and 8.2.
