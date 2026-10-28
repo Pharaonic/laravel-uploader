@@ -1,122 +1,128 @@
 <?php
 
-namespace Pharaonic\Laravel\Uploader\Tests\Feature;
-
-use DateTimeInterface;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
-use LogicException;
-use Mockery;
 use Mockery\MockInterface;
+use Pharaonic\Laravel\Uploader\Facades\Uploader;
 use Pharaonic\Laravel\Uploader\Models\Upload;
-use Pharaonic\Laravel\Uploader\Tests\TestCase;
-use RuntimeException;
 
-class UrlsTest extends TestCase
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function uploadRecord(array $attributes = []): Upload
 {
-    public function test_a_local_file_url_points_to_the_file_route_with_its_extension(): void
-    {
-        $upload = $this->record(['disk' => 'local']);
+    $upload = new Upload($attributes + [
+        'hash' => bin2hex(random_bytes(16)),
+        'name' => 'file.pdf',
+        'path' => 'files/file.pdf',
+        'size' => 10,
+        'extension' => 'pdf',
+        'mime' => 'application/pdf',
+    ]);
+    $upload->save();
 
-        $this->assertSame('http://localhost/file/'.$upload->hash.'.pdf', $upload->url());
-        $this->assertSame($upload->url(), $upload->url);
-    }
+    return $upload;
+}
 
-    public function test_a_local_file_url_can_leave_out_the_extension(): void
-    {
-        config(['pharaonic.uploader.extensional' => false]);
-        $this->app->forgetInstance('pharaonic.uploader');
-        \Pharaonic\Laravel\Uploader\Facades\Uploader::clearResolvedInstances();
+/**
+ * @return FilesystemAdapter&MockInterface
+ */
+function fakeS3Disk()
+{
+    /** @var FilesystemAdapter&MockInterface $disk */
+    $disk = Mockery::mock(FilesystemAdapter::class);
+    $disk->shouldReceive('providesTemporaryUrls')->andReturn(true)->byDefault();
 
-        $upload = $this->record(['disk' => 'local']);
+    Storage::set('s3', $disk);
 
-        $this->assertSame('http://localhost/file/'.$upload->hash, $upload->url());
-    }
+    return $disk;
+}
 
-    public function test_a_public_disk_file_url_comes_from_the_disk(): void
-    {
-        $upload = $this->record(['disk' => 'public']);
+test('a local file URL points to the file route with its extension', function () {
+    $upload = uploadRecord(['disk' => 'local']);
 
-        $this->assertSame(Storage::disk('public')->url($upload->path), $upload->url());
-    }
+    expect($upload->url())->toBe('http://localhost/file/'.$upload->hash.'.pdf')
+        ->and($upload->url)->toBe($upload->url());
+});
 
-    public function test_a_local_file_has_no_temporary_url(): void
-    {
-        $upload = $this->record(['disk' => 'local']);
+test('a local file URL can leave out the extension', function () {
+    config(['pharaonic.uploader.extensional' => false]);
+    $this->app->forgetInstance('pharaonic.uploader');
+    Uploader::clearResolvedInstances();
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The driver local does not support temporary URLs.');
+    $upload = uploadRecord(['disk' => 'local']);
 
-        $upload->temporaryUrl();
-    }
+    expect($upload->url())->toBe('http://localhost/file/'.$upload->hash);
+});
 
-    public function test_a_private_s3_file_url_is_a_temporary_url(): void
-    {
-        Carbon::setTestNow('2026-01-15 12:00:00');
-        $upload = $this->record(['disk' => 's3', 'visibility' => 'private', 'name' => 'Report "final".pdf']);
+test('a public disk file URL comes from the disk', function () {
+    $upload = uploadRecord(['disk' => 'public']);
 
-        $this->s3()->shouldReceive('temporaryUrl')
-            ->once()
-            ->withArgs(function (string $path, DateTimeInterface $expiration, array $options) use ($upload) {
-                return $path === $upload->path
-                    && $expiration->getTimestamp() === Carbon::parse('2026-01-15 12:30:00')->getTimestamp()
-                    && $options === ['ResponseContentDisposition' => 'inline; filename="Report \"final\".pdf"'];
-            })
-            ->andReturn('https://s3.test/signed');
+    expect($upload->url())->toBe(Storage::disk('public')->url($upload->path));
+});
 
-        $this->assertSame('https://s3.test/signed', $upload->url());
-        Carbon::setTestNow();
-    }
+test('a local file has no temporary URL', function () {
+    uploadRecord(['disk' => 'local'])->temporaryUrl();
+})->throws(RuntimeException::class, 'The driver local does not support temporary URLs.');
 
-    public function test_a_temporary_url_accepts_an_expiry_in_minutes(): void
-    {
-        Carbon::setTestNow('2026-01-15 12:00:00');
-        $upload = $this->record(['disk' => 's3', 'visibility' => 'public']);
+test('a private S3 file URL is a temporary URL', function () {
+    Carbon::setTestNow('2026-01-15 12:00:00');
+    $upload = uploadRecord(['disk' => 's3', 'visibility' => 'private', 'name' => 'Report "final".pdf']);
 
-        $this->s3()->shouldReceive('temporaryUrl')
-            ->once()
-            ->withArgs(fn (string $path, DateTimeInterface $expiration) => $expiration->getTimestamp() === Carbon::parse('2026-01-15 12:05:00')->getTimestamp())
-            ->andReturn('https://s3.test/signed');
+    fakeS3Disk()->shouldReceive('temporaryUrl')
+        ->once()
+        ->withArgs(function (string $path, DateTimeInterface $expiration, array $options) use ($upload) {
+            return $path === $upload->path
+                && $expiration->getTimestamp() === Carbon::parse('2026-01-15 12:30:00')->getTimestamp()
+                && $options === ['ResponseContentDisposition' => 'inline; filename="Report \"final\".pdf"'];
+        })
+        ->andReturn('https://s3.test/signed');
 
-        $this->assertSame('https://s3.test/signed', $upload->temporaryUrl(5));
-        Carbon::setTestNow();
-    }
+    expect($upload->url())->toBe('https://s3.test/signed');
+    Carbon::setTestNow();
+});
 
-    public function test_a_public_s3_file_url_is_the_disk_url(): void
-    {
-        $upload = $this->record(['disk' => 's3', 'visibility' => 'public']);
+test('a temporary URL accepts an expiry in minutes', function () {
+    Carbon::setTestNow('2026-01-15 12:00:00');
+    $upload = uploadRecord(['disk' => 's3', 'visibility' => 'public']);
 
-        $this->s3()->shouldReceive('url')->once()->with($upload->path)->andReturn('https://s3.test/file');
+    fakeS3Disk()->shouldReceive('temporaryUrl')
+        ->once()
+        ->withArgs(fn (string $path, DateTimeInterface $expiration) => $expiration->getTimestamp() === Carbon::parse('2026-01-15 12:05:00')->getTimestamp())
+        ->andReturn('https://s3.test/signed');
 
-        $this->assertSame('https://s3.test/file', $upload->url());
-    }
+    expect($upload->temporaryUrl(5))->toBe('https://s3.test/signed');
+    Carbon::setTestNow();
+});
 
-    public function test_visibility_cannot_be_set_on_a_local_disk(): void
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Visibility is only available for S3.');
+test('a public S3 file URL is the disk URL', function () {
+    $upload = uploadRecord(['disk' => 's3', 'visibility' => 'public']);
 
-        $this->record(['disk' => 'local'])->public();
-    }
+    fakeS3Disk()->shouldReceive('url')->once()->with($upload->path)->andReturn('https://s3.test/file');
 
-    public function test_saving_a_new_visibility_applies_it_to_the_stored_file(): void
-    {
-        $upload = $this->record(['disk' => 's3', 'visibility' => 'private']);
+    expect($upload->url())->toBe('https://s3.test/file');
+});
 
-        $this->s3()->shouldReceive('setVisibility')->once()->with($upload->path, 'public')->andReturn(true);
+test('visibility cannot be set on a local disk', function () {
+    uploadRecord(['disk' => 'local'])->public();
+})->throws(LogicException::class, 'Visibility is only available for S3.');
 
-        $upload->public()->save();
+test('saving a new visibility applies it to the stored file', function () {
+    $upload = uploadRecord(['disk' => 's3', 'visibility' => 'private']);
 
-        $this->assertSame('public', $upload->fresh()->visibility);
-    }
+    fakeS3Disk()->shouldReceive('setVisibility')->once()->with($upload->path, 'public')->andReturn(true);
 
-    public function test_info_returns_the_url_or_the_file_details(): void
-    {
-        $upload = $this->record(['disk' => 'local', 'size' => 2048]);
+    $upload->public()->save();
 
-        $this->assertSame($upload->url, $upload->info());
-        $this->assertSame([
+    expect($upload->fresh()->visibility)->toBe('public');
+});
+
+test('info returns the URL or the file details', function () {
+    $upload = uploadRecord(['disk' => 'local', 'size' => 2048]);
+
+    expect($upload->info())->toBe($upload->url)
+        ->and($upload->info('all'))->toBe([
             'id' => $upload->id,
             'name' => 'file.pdf',
             'extension' => 'pdf',
@@ -125,53 +131,19 @@ class UrlsTest extends TestCase
             'url' => $upload->url,
             'content' => null,
             'thumbnail' => null,
-        ], $upload->info('all'));
-    }
-
-    public function test_info_includes_svg_content_and_a_loaded_thumbnail(): void
-    {
-        Storage::fake('local');
-        Storage::disk('local')->put('icon.svg', '<svg/>');
-
-        $thumbnail = $this->record(['disk' => 'local']);
-        $upload = $this->record(['disk' => 'local', 'path' => 'icon.svg', 'extension' => 'svg', 'mime' => 'image/svg+xml', 'thumbnail_id' => $thumbnail->id]);
-
-        $info = $upload->load('thumbnail')->info('all');
-
-        $this->assertIsArray($info);
-        $this->assertSame('<svg/>', $info['content']);
-        $this->assertSame($thumbnail->info('all'), $info['thumbnail']);
-    }
-
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
-    private function record(array $attributes = []): Upload
-    {
-        $upload = new Upload($attributes + [
-            'hash' => bin2hex(random_bytes(16)),
-            'name' => 'file.pdf',
-            'path' => 'files/file.pdf',
-            'size' => 10,
-            'extension' => 'pdf',
-            'mime' => 'application/pdf',
         ]);
-        $upload->save();
+});
 
-        return $upload;
-    }
+test('info includes SVG content and a loaded thumbnail', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('icon.svg', '<svg/>');
 
-    /**
-     * @return FilesystemAdapter&MockInterface
-     */
-    private function s3()
-    {
-        /** @var FilesystemAdapter&MockInterface $disk */
-        $disk = Mockery::mock(FilesystemAdapter::class);
-        $disk->shouldReceive('providesTemporaryUrls')->andReturn(true)->byDefault();
+    $thumbnail = uploadRecord(['disk' => 'local']);
+    $upload = uploadRecord(['disk' => 'local', 'path' => 'icon.svg', 'extension' => 'svg', 'mime' => 'image/svg+xml', 'thumbnail_id' => $thumbnail->id]);
 
-        Storage::set('s3', $disk);
+    $info = $upload->load('thumbnail')->info('all');
 
-        return $disk;
-    }
-}
+    expect($info)->toBeArray()
+        ->and($info['content'])->toBe('<svg/>')
+        ->and($info['thumbnail'])->toBe($thumbnail->info('all'));
+});

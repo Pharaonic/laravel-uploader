@@ -1,37 +1,19 @@
 <?php
 
-namespace Pharaonic\Laravel\Uploader\Tests\Feature;
-
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
-use Pharaonic\Laravel\Uploader\Tests\TestCase;
 
-class LegacyConfigTest extends TestCase
-{
-    protected function resolveApplicationConfiguration($app)
-    {
-        parent::resolveApplicationConfiguration($app);
+test('a config file published by 4.x still applies', function () {
+    expect(config('pharaonic.uploader.disk'))->toBe('public')
+        ->and(config('pharaonic.uploader.uri'))->toBe('/legacy')
+        ->and(Uploader::options()['disk'])->toBe('public');
+});
 
-        // Before the providers register: what Laravel loads from config/Pharaonic/uploader.php and config/pharaonic/uploader.php.
-        $app['config']->set('Pharaonic.uploader', ['disk' => 'public', 'expire' => 60, 'uri' => '/legacy']);
-        $app['config']->set('pharaonic.uploader', ['expire' => 90]);
-    }
+test('the canonical config file takes precedence', function () {
+    expect(config('pharaonic.uploader.expire'))->toBe(90)
+        ->and(config('Pharaonic.uploader.expire'))->toBe(90);
+});
 
-    public function test_a_config_file_published_by_4x_still_applies(): void
-    {
-        $this->assertSame('public', config('pharaonic.uploader.disk'));
-        $this->assertSame('/legacy', config('pharaonic.uploader.uri'));
-        $this->assertSame('public', Uploader::options()['disk']);
-    }
-
-    public function test_the_canonical_config_file_takes_precedence(): void
-    {
-        $this->assertSame(90, config('pharaonic.uploader.expire'));
-        $this->assertSame(90, config('Pharaonic.uploader.expire'));
-    }
-
-    public function test_missing_keys_fall_back_to_the_package_defaults(): void
-    {
-        $this->assertSame('private', config('pharaonic.uploader.visibility'));
-        $this->assertTrue(config('pharaonic.uploader.extensional'));
-    }
-}
+test('missing keys fall back to the package defaults', function () {
+    expect(config('pharaonic.uploader.visibility'))->toBe('private')
+        ->and(config('pharaonic.uploader.extensional'))->toBeTrue();
+});
