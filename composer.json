@@ -26,19 +26,19 @@
         "source": "https://github.com/Pharaonic/laravel-uploader"
     },
     "require": {
-        "php": ">=8.0 <8.1",
-        "illuminate/contracts": "^7.30",
-        "illuminate/database": "^7.30",
-        "illuminate/filesystem": "^7.30",
-        "illuminate/http": "^7.30",
-        "illuminate/routing": "^7.30",
-        "illuminate/support": "^7.30",
+        "php": ">=8.0 <8.2",
+        "illuminate/contracts": "^8.75",
+        "illuminate/database": "^8.75",
+        "illuminate/filesystem": "^8.75",
+        "illuminate/http": "^8.75",
+        "illuminate/routing": "^8.75",
+        "illuminate/support": "^8.75",
         "intervention/image": "^2.7",
-        "pharaonic/laravel-readable": "^7.0"
+        "pharaonic/laravel-readable": "^8.0"
     },
     "require-dev": {
         "laravel/pint": "^1.5",
-        "orchestra/testbench": "^5.20",
+        "orchestra/testbench": "^6.25",
         "pestphp/pest": "^1.23",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^9.6.33"
@@ -92,9 +92,8 @@
             "advisories": {
                 "block": false,
                 "ignore": {
-                    "laravel/framework": "No fixed release within Laravel 7; the application chooses the framework release.",
-                    "league/commonmark": "No fixed release within Laravel 7; the application chooses the framework release.",
-                    "league/flysystem": "No fixed release within Laravel 7; the application chooses the framework release."
+                    "laravel/framework": "No fixed release within Laravel 8; the application chooses the framework release.",
+                    "league/flysystem": "No fixed release within Laravel 8; the application chooses the framework release."
                 }
             }
         },

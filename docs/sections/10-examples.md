@@ -38,7 +38,7 @@ Keep the avatar's hash on the user and show the thumbnail in lists.
 
 - ===Model
 
-  ```php title="app/User.php"
+  ```php title="app/Models/User.php"
   use Pharaonic\Laravel\Uploader\Models\Upload;
 
   public function avatarUpload()
