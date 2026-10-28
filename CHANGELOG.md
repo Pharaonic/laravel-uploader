@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 9.0.0 - Unreleased
+
+`9.x` supports Laravel 9 on PHP 8.0, 8.1 and 8.2.
+
+### Compatibility
+
+- Laravel 9.33+ on PHP 8.0, 8.1 or 8.2. `pharaonic/laravel-readable` 9.x needs Laravel 9.33, the first 9.x release that requires a Carbon release working on PHP 8.2.
+- Requires `pharaonic/laravel-readable` `^9.0`.
+- The same API, configuration, route, migrations and behavior as 8.0.0, including the deprecated `Pharaonic.uploader` key.
+
 ## 8.0.0 - Unreleased
 
 `8.x` supports Laravel 8 on PHP 8.0 and 8.1.
