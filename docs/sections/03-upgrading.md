@@ -1,6 +1,6 @@
 ## Upgrading from 4.x
 
-The `7.x` line runs on Laravel 7 with PHP 8.0. Most applications upgrade without code changes; check the points below.
+The `8.x` line runs on Laravel 8 with PHP 8.0 or 8.1. Most applications upgrade without code changes; check the points below.
 
 ### Database
 
