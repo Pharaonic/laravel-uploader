@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 6.0.0 - Unreleased
+## 6.0.0 - 2026-10-28
 
 The first release of the per-Laravel-major lines. `6.x` supports Laravel 6 on PHP 8.0.
 
