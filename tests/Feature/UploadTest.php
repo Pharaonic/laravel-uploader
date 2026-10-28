@@ -127,6 +127,8 @@ test('a thumbnail without a size is rejected before anything is stored', functio
 });
 
 test('a thumbnail the image driver cannot read leaves nothing stored', function () {
+    $this->requiresGd();
+
     $file = UploadedFile::fake()->create('scan.tiff', 1, 'image/tiff');
 
     // The original is stored before the thumbnail fails, then removed.
