@@ -24,6 +24,7 @@ The first release of the per-Laravel-major lines. `6.x` supports Laravel 6 on PH
 - The `disk` option defaults to `FILESYSTEM_DISK`, then `FILESYSTEM_DRIVER` (Laravel 6–8), then `local`.
 - The package requires the `illuminate/*` components it uses instead of `laravel/framework`, and `pharaonic/laravel-readable` `^6.0`.
 - The migration class is named (`CreateUploadsTable`) so it runs on Laravel 6–8. Its file name and schema are unchanged.
+- A new migration makes `uploads.hash` unique instead of only indexed. Run `php artisan migrate`; it fails only if the table already holds duplicate hashes.
 - Exceptions are SPL subclasses of `Exception`: `InvalidArgumentException` for a missing path or thumbnail size, `LogicException` for visibility on a local disk, `RuntimeException` for a disk without temporary URLs. Existing `catch (\Exception)` blocks still catch them.
 
 ### Deprecated
@@ -38,6 +39,7 @@ The first release of the per-Laravel-major lines. `6.x` supports Laravel 6 on PH
 
 - Stored paths use `/` on Windows, so S3 keys and saved paths no longer contain backslashes.
 - A thumbnail without a width or height is rejected before the original file is stored.
+- When the image driver cannot read an image, the original file is deleted from the disk instead of being left there without a record.
 - A file deleted from the disk returns 404 from the file route instead of an empty response.
 - The `Content-Disposition` file name of temporary URLs is escaped.
 - `temporaryUrl()` declares its nullable `$expire` explicitly, so PHP 8.4 reports no deprecation.

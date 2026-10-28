@@ -1,0 +1,17 @@
+- Getting Started
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Upgrading from 4.x](#upgrading)
+  - [Configuration](#configuration)
+- Usage
+  - [Basic Usage](#basic-usage)
+  - [Thumbnails](#thumbnails)
+  - [URLs & Visibility](#urls-and-visibility)
+  - [The File Route](#file-route)
+- API Reference
+  - [Helpers, Facade & Model](#api-reference)
+- Examples
+  - [Use Cases](#examples)
+  - [Troubleshooting](#troubleshooting)
+- Community
+  - [Contributors](#contributors)
