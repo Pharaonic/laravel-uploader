@@ -4,16 +4,10 @@ namespace Pharaonic\Laravel\Uploader\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Pharaonic\Laravel\Uploader\Traits\Urls;
-use Pharaonic\Laravel\Uploader\Traits\Visibility;
+use Pharaonic\Laravel\Uploader\Concerns\HasUrls;
+use Pharaonic\Laravel\Uploader\Concerns\HasVisibility;
 
 /**
- * Upload Model
- *
- * @version 4.0
- *
- * @author Moamen Eltouny (Raggi) <raggigroup@gmail.com>
- *
  * @property int $id
  * @property int|null $thumbnail_id
  * @property string $hash
@@ -24,28 +18,21 @@ use Pharaonic\Laravel\Uploader\Traits\Visibility;
  * @property string $mime
  * @property string $disk
  * @property string|null $visibility
- * @property-read string url
- * @property-read string temporaryUrl
- * @property-read \Carbon\Carbon $created_at
- * @property-read \Carbon\Carbon $updated_at
+ * @property-read string $url
+ * @property-read string $temporaryUrl
+ * @property-read \Illuminate\Support\Carbon|null $created_at
+ * @property-read \Illuminate\Support\Carbon|null $updated_at
  * @property-read Upload|null $thumbnail
- *
- * @method string size(bool $decimal = true)
- * @method Upload visibility(string $visibility)
- * @method Upload public()
- * @method Upload private()
- * @method string url()
- * @method string temporaryUrl(int $expire = null)
  */
 class Upload extends Model
 {
-    use Urls;
-    use Visibility;
+    use HasUrls;
+    use HasVisibility;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'thumbnail_id',
@@ -62,7 +49,7 @@ class Upload extends Model
     /**
      * The attributes that should be cast.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'size' => 'integer',
@@ -71,17 +58,17 @@ class Upload extends Model
     /**
      * Get readable size.
      *
-     * @var bool
+     * @return string|null
      */
     public function size(bool $decimal = true)
     {
-        return ReadableSize($this->size, $decimal);
+        return readable_file_size($this->size, $decimal);
     }
 
     /**
      * Getting Thumbnail Object
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function thumbnail()
     {
@@ -91,21 +78,20 @@ class Upload extends Model
     /**
      * Get the file URL or other information based on the target.
      *
-     * @return string|array|null
+     * @return string|array<mixed>
      */
     public function info(string $target = 'url', bool $isTemporary = false, ?int $expire = null)
     {
+        $url = $isTemporary ? $this->temporaryUrl($expire) : $this->url;
+
         if ($target == 'url') {
-            return $isTemporary
-                ? $this->temporaryUrl($expire)
-                : $this->url;
+            return $url;
         }
 
-        $url = $isTemporary ? $this->temporaryUrl($expire) : $this->url;
-        $content = in_array($this->extension, ['svg']) ? Storage::disk($this->disk)->get($this->path) : null;
-        $thumbnail = $this->relationLoaded('thumbnail') && $this->thumbnail ?
-            $this->thumbnail->info($target, $isTemporary, $expire) :
-            null;
+        $content = $this->extension === 'svg' ? Storage::disk($this->disk)->get($this->path) : null;
+        $thumbnail = $this->relationLoaded('thumbnail') && $this->thumbnail
+            ? $this->thumbnail->info($target, $isTemporary, $expire)
+            : null;
 
         return $this->only('id', 'name', 'extension', 'mime') + [
             'size' => $this->size(),
