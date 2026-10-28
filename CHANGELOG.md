@@ -10,7 +10,13 @@ All notable changes to this project will be documented in this file.
 
 - Laravel 7.30+ on PHP 8.0.
 - Requires `pharaonic/laravel-readable` `^7.0`.
-- The same API, configuration, route, migrations and behavior as 6.0.0, including the deprecated `Pharaonic.uploader` key.
+- The same API, configuration, route, migrations and behavior as 6.1.0, including the deprecated `Pharaonic.uploader` key.
+
+## 6.1.0 - Unreleased
+
+### Changed
+
+- Behavior change from 6.0.x: a thumbnail's `name` puts `-thumbnail` before the extension and ends with the thumbnail's own extension (`photo-thumbnail.jpg` instead of `photo.jpg-thumbnail`), so the file route's `Content-Disposition` filename keeps a usable extension. Thumbnails stored before keep their name.
 
 ## 6.0.0 - 2026-10-28
 
