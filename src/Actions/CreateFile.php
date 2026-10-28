@@ -3,143 +3,200 @@
 namespace Pharaonic\Laravel\Uploader\Actions;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
+use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
+use InvalidArgumentException;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
 use Pharaonic\Laravel\Uploader\Models\Upload;
+use RuntimeException;
 
 class CreateFile
 {
     /**
      * Handle the action.
      *
-     * @param UploadedFile $file
-     * @param array|null $options
+     * @param  array<mixed>  $options
      * @return Upload
+     *
+     * @throws InvalidArgumentException if a thumbnail is requested without a width or height.
      */
     public function handle(UploadedFile $file, array $options = [])
     {
-        $hash = $this->generateHash($file);
-        $extension = $file->extension();
-        extract($this->options($options));
+        $mime = (string) $file->getMimeType();
+        $thumbnail = $this->wantsThumbnail($mime, $options) ? $this->thumbnailOptions($options) : null;
 
-        $file->storeAs($path, $hash . '.' . $extension, [
+        $disk = $this->disk($options);
+        $visibility = $this->visibility($disk, $options);
+        $path = $this->path($options);
+
+        $hash = $this->generateHash($file);
+        $name = $hash.'.'.$file->extension();
+
+        $file->storeAs($path, $name, array_filter([
             'disk' => $disk,
             'visibility' => $visibility,
-        ]);
+        ]));
 
-        // Thumbnail Generating
-        if (str_starts_with($file->getMimeType(), 'image/') && isset($options['thumbnail'])) {
-            $thumbnail = $this->uploadThumbnail($file, $options);
+        if ($thumbnail !== null) {
+            unset($options['thumbnail']);
+            $thumbnail = $this->uploadThumbnail($file, $thumbnail, $options);
         }
 
-        return Upload::create([
-            'thumbnail_id'  => isset($thumbnail) ? $thumbnail->id : null,
-            'hash'          => $hash,
-            'disk'          => $disk,
-            'visibility'    => $visibility,
-            'path'          => $path . $hash . '.' . $extension,
-            'extension'     => $extension,
-            'name'          => $file->getClientOriginalName(),
-            'mime'          => $file->getMimeType(),
-            'size'          => $file->getSize(),
+        $upload = new Upload([
+            'thumbnail_id' => $thumbnail?->id,
+            'hash' => $hash,
+            'disk' => $disk,
+            'visibility' => $visibility,
+            'path' => $path.$name,
+            'extension' => $file->extension(),
+            'name' => $file->getClientOriginalName(),
+            'mime' => $mime,
+            'size' => $file->getSize(),
         ]);
+        $upload->save();
+
+        return $upload;
     }
 
     /**
      * Generate a new Hash.
      *
-     * @param UploadedFile $file
      * @return string
      */
     protected function generateHash(UploadedFile $file)
     {
-        $hash = Str::random(27)  . pathinfo($file->hashName(), PATHINFO_FILENAME);
+        $hash = Str::random(27).pathinfo($file->hashName(), PATHINFO_FILENAME);
 
-        if (Upload::whereHash($hash)->exists())
+        if (Upload::query()->where('hash', $hash)->exists()) {
             return $this->generateHash($file);
+        }
 
         return $hash;
     }
 
     /**
-     * Get the options list.
+     * Get the disk name.
      *
-     * @param array $options
-     * @return array
+     * @param  array<mixed>  $options
      */
-    protected function options(array $options)
+    protected function disk(array $options): string
     {
-        $originalOptions = Uploader::options();
+        $disk = $options['disk'] ?? Uploader::options()['disk'] ?? null;
 
-        $path = trim($originalOptions['path'], '/') . '/';
-        $filePath = trim($options['path'] ?? '', '/');
+        return is_string($disk) ? $disk : 'local';
+    }
 
-        if (!empty($filePath)) {
-            $path .= $filePath . '/';
+    /**
+     * Get the visibility, which only applies to non-local drivers.
+     *
+     * @param  array<mixed>  $options
+     */
+    protected function visibility(string $disk, array $options): ?string
+    {
+        if (Config::get('filesystems.disks.'.$disk.'.driver') === 'local') {
+            return null;
+        }
+
+        $visibility = $options['visibility'] ?? Uploader::options()['visibility'] ?? null;
+
+        return is_string($visibility) ? $visibility : null;
+    }
+
+    /**
+     * Get the directory of the file on the disk, ending with a slash.
+     *
+     * @param  array<mixed>  $options
+     */
+    protected function path(array $options): string
+    {
+        $base = Uploader::options()['path'] ?? '';
+        $path = trim(is_string($base) ? $base : '', '/').'/';
+
+        $filePath = trim(is_string($options['path'] ?? null) ? $options['path'] : '', '/');
+
+        if ($filePath !== '') {
+            $path .= $filePath.'/';
+        }
+
+        return $path.date('Y-m-d').'/';
+    }
+
+    /**
+     * Determine whether a thumbnail should be generated.
+     *
+     * @param  array<mixed>  $options
+     */
+    protected function wantsThumbnail(string $mime, array $options): bool
+    {
+        return isset($options['thumbnail'])
+            && str_starts_with($mime, 'image/')
+            && $mime !== 'image/svg+xml';
+    }
+
+    /**
+     * Validate the thumbnail options.
+     *
+     * @param  array<mixed>  $options
+     * @return array{ratio: bool, width: int|null, height: int|null}
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function thumbnailOptions(array $options): array
+    {
+        $thumbnail = is_array($options['thumbnail'] ?? null) ? $options['thumbnail'] : [];
+
+        $width = isset($thumbnail['width']) && is_numeric($thumbnail['width']) ? (int) $thumbnail['width'] : null;
+        $height = isset($thumbnail['height']) && is_numeric($thumbnail['height']) ? (int) $thumbnail['height'] : null;
+
+        if (! $width && ! $height) {
+            throw new InvalidArgumentException('You have to set width or height thumbnail\'s option.');
         }
 
         return [
-            'disk' => $disk = ($options['disk'] ?? $originalOptions['disk']),
-            'visibility' => config('filesystems.disks.' . $disk . '.driver') != 'local' ? ($options['visibility'] ?? $originalOptions['visibility']) : null,
-            'path' => str_replace(
-                '/',
-                DIRECTORY_SEPARATOR,
-                $path . date('Y-m-d', time()) . '/'
-            ),
+            'ratio' => (bool) ($thumbnail['ratio'] ?? false),
+            'width' => $width ?: null,
+            'height' => $height ?: null,
         ];
     }
 
     /**
      * Upload Thumbnail.
      *
-     * @param UploadedFile $file
-     * @param array $options
+     * @param  array{ratio: bool, width: int|null, height: int|null}  $thumbnail
+     * @param  array<mixed>  $options
      * @return Upload
      */
-    protected function uploadThumbnail(UploadedFile $file, array $options = [])
+    protected function uploadThumbnail(UploadedFile $file, array $thumbnail, array $options = [])
     {
-        $ratio  = $options['thumbnail']['ratio'] ?? false;
-        $width  = $options['thumbnail']['width'] ?? null;
-        $height = $options['thumbnail']['height'] ?? null;
-        unset($options['thumbnail']);
+        $image = Image::make($file);
 
-        if (!$width && !$height) {
-            throw new \Exception('You have to set width or height thumbnail\'s option.');
-        }
-
-        $thumbnail = Image::make($file);
-
-        // Ratio or Fixed
-        if ($ratio) {
-            $thumbnail->resize(
-                $width ?? null,
-                $width > 0 ? null : $height,
-                fn($constraint) => $constraint->aspectRatio()
+        if ($thumbnail['ratio']) {
+            $image->resize(
+                $thumbnail['width'],
+                $thumbnail['width'] ? null : $thumbnail['height'],
+                fn (Constraint $constraint) => $constraint->aspectRatio()
             );
         } else {
-            $thumbnail->resize($width, $height);
+            $image->resize($thumbnail['width'], $thumbnail['height']);
         }
 
-        // Create Fake file
-        $name = Str::random(37) . '.' . $file->extension();
+        $temporary = tempnam(sys_get_temp_dir(), 'pharaonic-thumb-');
 
-        File::ensureDirectoryExists(storage_path('app/public/pharaonic-thumbs'));
-        $thumbnail->save(storage_path('app/public/pharaonic-thumbs/' . $name), 100);
+        if ($temporary === false) {
+            throw new RuntimeException('Unable to create a temporary thumbnail file.');
+        }
 
-        $file = $this->handle(
-            new UploadedFile(
-                storage_path('app/public/pharaonic-thumbs/' . $name),
-                $file->getClientOriginalName() . '-thumbnail',
-                $thumbnail->mime()
-            ),
-            $options
-        );
+        try {
+            $image->save($temporary, 100, $file->extension());
 
-        // Delete Fake File
-        File::delete(storage_path('app/public/pharaonic-thumbs/' . $name));
-
-        return $file;
+            return $this->handle(
+                new UploadedFile($temporary, $file->getClientOriginalName().'-thumbnail', $image->mime()),
+                $options
+            );
+        } finally {
+            @unlink($temporary);
+        }
     }
 }

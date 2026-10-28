@@ -2,37 +2,37 @@
 
 return [
     /**
-     * Storage Disk (local, public, s3, ...)
+     * Storage disk (local, public, s3, ...).
      */
-    'disk'  => env('FILESYSTEM_DISK', 'local'),
+    'disk' => env('FILESYSTEM_DISK', env('FILESYSTEM_DRIVER', 'local')),
 
     /**
-     * Uploading Path
+     * Base path of the uploaded files on the disk.
      */
-    'path'  => '/',
+    'path' => '/',
 
     /**
-     * Expiry time of temporary-url in minutes (S3)
+     * Expiry time of temporary URLs, in minutes (S3).
      */
     'expire' => 30,
 
     /**
-     * Visibility of the uploaded files (S3)
+     * Visibility of the uploaded files (S3).
      */
     'visibility' => 'private',
 
     /**
-     * Include the file extension in the URL (local)
+     * Include the file extension in the URL (local).
      */
     'extensional' => true,
 
     /**
-     * Route Contoller Class
+     * Controller of the file route.
      */
-    'controller'  => \Pharaonic\Laravel\Uploader\Http\Controllers\UploadController::class,
+    'controller' => \Pharaonic\Laravel\Uploader\Http\Controllers\UploadController::class,
 
     /**
-     * Route URI (/file/{hash})
+     * URI of the file route (/file/{hash}).
      */
     'uri' => '/file',
 ];

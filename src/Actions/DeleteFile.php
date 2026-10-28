@@ -10,21 +10,18 @@ class DeleteFile
     /**
      * Delete file with the thumbnail.
      *
-     * @param  Upload $file
      * @return void
      */
     public function handle(Upload $file)
     {
-        if ($file->thumbnail_id) {
+        if ($file->thumbnail_id && $file->thumbnail) {
             $file->thumbnail->delete();
         }
 
         $fs = Storage::disk($file->disk);
 
-        if (!$fs->exists($file->path)) {
-            return;
+        if ($fs->exists($file->path)) {
+            $fs->delete($file->path);
         }
-
-        return $fs->delete($file->path);
     }
 }

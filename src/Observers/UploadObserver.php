@@ -11,12 +11,11 @@ class UploadObserver
     /**
      * Handle the Upload "updated" event.
      *
-     * @param  Upload  $upload
      * @return void
      */
     public function updated(Upload $upload)
     {
-        if ($upload->wasChanged('visibility')) {
+        if ($upload->wasChanged('visibility') && $upload->visibility !== null) {
             Storage::disk($upload->disk)->setVisibility($upload->path, $upload->visibility);
         }
     }
@@ -24,7 +23,6 @@ class UploadObserver
     /**
      * Handle the Upload "deleting" event.
      *
-     * @param  Upload  $upload
      * @return void
      */
     public function deleting(Upload $upload)

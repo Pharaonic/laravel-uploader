@@ -4,45 +4,53 @@ namespace Pharaonic\Laravel\Uploader\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
+use Pharaonic\Laravel\Uploader\Support\Disposition;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UploadController
 {
     /**
      * Stream the file.
      *
-     * @param string $hash
-     * @return \Illuminate\Http\Response
+     * @return StreamedResponse
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException if no upload has the hash.
+     * @throws NotFoundHttpException if the file is missing from the disk.
      */
     public function __invoke(string $hash)
     {
-        if (Uploader::options()['extensional'] && str_contains($hash, '.')) {
-            $hash = explode('.', $hash);
-            unset($hash[count($hash) - 1]);
-
-            $hash = implode('.', $hash);
+        if ((Uploader::options()['extensional'] ?? true) && str_contains($hash, '.')) {
+            $hash = substr($hash, 0, (int) strrpos($hash, '.'));
         }
 
-        abort_if(
-            !($file = uploaded($hash)),
-            404,
-            'File Not Found.'
-        );
+        $file = uploaded($hash);
+        $disk = Storage::disk($file->disk);
 
-        return response()->stream(
-            function () use ($file) {
-                if ($stream = Storage::disk($file->disk)->readStream($file->path)) {
-                    while (!feof($stream)) {
-                        echo fread($stream, 1024);
-                        flush();
-                    }
-                    fclose($stream);
+        if (! $disk->exists($file->path)) {
+            throw new NotFoundHttpException('File Not Found.');
+        }
+
+        return new StreamedResponse(
+            function () use ($disk, $file) {
+                $stream = $disk->readStream($file->path);
+
+                if (! is_resource($stream)) {
+                    return;
                 }
 
-                return;
+                while (! feof($stream)) {
+                    echo fread($stream, 8192);
+                    flush();
+                }
+
+                fclose($stream);
             },
             200,
             [
-                'Content-Type' => $file->mime
+                'Content-Type' => $file->mime,
+                'Content-Disposition' => Disposition::make(Disposition::type($file->mime), $file->name),
+                'X-Content-Type-Options' => 'nosniff',
             ]
         );
     }

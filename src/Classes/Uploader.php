@@ -3,19 +3,17 @@
 namespace Pharaonic\Laravel\Uploader\Classes;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
+use InvalidArgumentException;
 use Pharaonic\Laravel\Uploader\Actions\CreateFile;
+use Pharaonic\Laravel\Uploader\Models\Upload;
 
-/**
- * @method array options() Get uploader options.
- * @method Router route() Create a new Router instance.
- * @method \Pharaonic\Laravel\Uploader\Models\Upload upload(\Illuminate\Http\UploadedFile|string $file, array $options = []) Upload a new file.
- */
 class Uploader
 {
     /**
      * The options list.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected array $options;
 
@@ -24,13 +22,15 @@ class Uploader
      */
     public function __construct()
     {
-        $this->options = config('Pharaonic.uploader');
+        $options = Config::get('pharaonic.uploader');
+
+        $this->options = is_array($options) ? $options : [];
     }
 
     /**
      * Get uploader options.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function options()
     {
@@ -50,25 +50,19 @@ class Uploader
     /**
      * Upload a new file.
      *
-     * @param UploadedFile|string $file
-     * @param array|null $options
-     * @return \Pharaonic\Laravel\Uploader\Models\Upload
-     * 
-     * @throws \Exception if the file path does not exist.
+     * @param  array<mixed>  $options
+     * @return Upload
+     *
+     * @throws InvalidArgumentException if the file path does not exist.
      */
     public function upload(UploadedFile|string $file, array $options = [])
     {
         if (is_string($file)) {
-            if (!file_exists($file)) {
-                throw new \Exception('The file path does not exist.');
+            if (! is_file($file)) {
+                throw new InvalidArgumentException('The file path does not exist.');
             }
 
-            $name = basename($file);
-            $file = new UploadedFile(
-                $file,
-                pathinfo($name, PATHINFO_FILENAME),
-                pathinfo($name, PATHINFO_EXTENSION),
-            );
+            $file = new UploadedFile($file, basename($file));
         }
 
         return (new CreateFile)->handle($file, $options);
