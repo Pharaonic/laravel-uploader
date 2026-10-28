@@ -25,7 +25,7 @@ Configuration keys (`pharaonic.uploader.*`), publish tags, and registered Blade,
 - The `Upload` model, its `uploads` table, its `thumbnail` relation, and its `url()`, `temporaryUrl()`, `info()`, `size()`, `visibility()`, `public()` and `private()` methods.
 - Upload options: `disk`, `path`, `visibility`, `thumbnail` (`width`, `height`, `ratio`).
 - The route name `uploader.file` and URI `{uri}/{hash}` (default `/file/{hash}`). Stored content links to these URLs; never change them on an existing line.
-- The migration file `2021_02_01_000001_create_uploads_table.php` keeps its name. Its class stays named while `6.x`–`8.x` exist.
+- The migration files `2021_02_01_000001_create_uploads_table.php` and `2026_10_28_000001_make_uploads_hash_unique.php` keep their names; schema changes always come as new migrations. Their classes stay named while `6.x`–`8.x` exist.
 - Publish tags: `pharaonic`, `laravel-uploader`, `pharaonic-config`, `uploader-config`, `pharaonic-migrations`, `uploader-migrations`.
 - Model traits live in `Concerns` (`HasUrls`, `HasVisibility`). The 4.x `Traits\*` names were removed in 6.0.0.
 - The deprecated `Pharaonic.uploader` key is applied from `config/Pharaonic/uploader.php` and kept in sync with `pharaonic.uploader`. It is removed only in the first line that supports PHP 8.6.

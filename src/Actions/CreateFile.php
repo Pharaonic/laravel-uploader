@@ -4,6 +4,7 @@ namespace Pharaonic\Laravel\Uploader\Actions;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Constraint;
 use Intervention\Image\Facades\Image;
@@ -11,6 +12,7 @@ use InvalidArgumentException;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
 use Pharaonic\Laravel\Uploader\Models\Upload;
 use RuntimeException;
+use Throwable;
 
 class CreateFile
 {
@@ -41,7 +43,14 @@ class CreateFile
 
         if ($thumbnail !== null) {
             unset($options['thumbnail']);
-            $thumbnail = $this->uploadThumbnail($file, $thumbnail, $options);
+
+            try {
+                $thumbnail = $this->uploadThumbnail($file, $thumbnail, $options);
+            } catch (Throwable $e) {
+                Storage::disk($disk)->delete($path.$name);
+
+                throw $e;
+            }
         }
 
         $upload = new Upload([

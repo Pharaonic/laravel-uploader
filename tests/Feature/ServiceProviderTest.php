@@ -2,10 +2,12 @@
 
 namespace Pharaonic\Laravel\Uploader\Tests\Feature;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Pharaonic\Laravel\Uploader\Http\Controllers\UploadController;
+use Pharaonic\Laravel\Uploader\Models\Upload;
 use Pharaonic\Laravel\Uploader\Tests\TestCase;
 use Pharaonic\Laravel\Uploader\UploaderServiceProvider;
 
@@ -69,6 +71,27 @@ class ServiceProviderTest extends TestCase
         $this->assertTrue(Schema::hasColumns('uploads', [
             'id', 'thumbnail_id', 'hash', 'disk', 'visibility', 'name', 'path', 'size', 'extension', 'mime', 'created_at', 'updated_at',
         ]));
+    }
+
+    public function test_the_hash_is_unique(): void
+    {
+        $attributes = ['hash' => 'same', 'name' => 'a.txt', 'path' => 'a.txt', 'size' => 1, 'extension' => 'txt', 'mime' => 'text/plain'];
+        (new Upload($attributes))->save();
+
+        $this->expectException(QueryException::class);
+
+        (new Upload($attributes))->save();
+    }
+
+    public function test_the_unique_hash_migration_can_be_rolled_back(): void
+    {
+        $this->artisan('migrate:rollback', ['--step' => 1])->run();
+
+        $attributes = ['hash' => 'same', 'name' => 'a.txt', 'path' => 'a.txt', 'size' => 1, 'extension' => 'txt', 'mime' => 'text/plain'];
+        (new Upload($attributes))->save();
+        (new Upload($attributes))->save();
+
+        $this->assertSame(2, Upload::query()->where('hash', 'same')->count());
     }
 
     /**

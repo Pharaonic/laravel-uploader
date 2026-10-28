@@ -5,6 +5,7 @@ namespace Pharaonic\Laravel\Uploader\Tests\Feature;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Exception\NotReadableException;
 use InvalidArgumentException;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
 use Pharaonic\Laravel\Uploader\Models\Upload;
@@ -130,6 +131,21 @@ class UploadTest extends TestCase
             $this->fail('No exception was thrown.');
         } catch (InvalidArgumentException $e) {
             $this->assertSame('You have to set width or height thumbnail\'s option.', $e->getMessage());
+        }
+
+        $this->assertSame(0, Upload::query()->count());
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
+    public function test_a_thumbnail_the_image_driver_cannot_read_leaves_nothing_stored(): void
+    {
+        $file = UploadedFile::fake()->create('scan.tiff', 1, 'image/tiff');
+
+        try {
+            Uploader::upload($file, ['thumbnail' => ['width' => 10]]);
+            $this->fail('No exception was thrown.');
+        } catch (NotReadableException $e) {
+            // The original was stored before the thumbnail failed, then removed.
         }
 
         $this->assertSame(0, Upload::query()->count());
