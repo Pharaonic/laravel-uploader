@@ -83,10 +83,27 @@ test('it generates a thumbnail for an image', function () {
     $thumbnail = $upload->thumbnail;
 
     expect($thumbnail)->toBeInstanceOf(Upload::class)
-        ->and($thumbnail->name)->toBe('photo.jpg-thumbnail')
+        ->and($thumbnail->extension)->toBeIn(['jpg', 'jpeg'])
+        ->and($thumbnail->name)->toBe('photo-thumbnail.'.$thumbnail->extension)
         ->and($thumbnail->mime)->toBe('image/jpeg')
         ->and(array_slice((array) getimagesizefromstring((string) Storage::disk('local')->get($thumbnail->path)), 0, 2))->toBe([100, 50])
         ->and($thumbnail->thumbnail_id)->toBeNull();
+});
+
+test('the thumbnail name ends with the thumbnail extension', function () {
+    $this->requiresGd();
+
+    $jpeg = Uploader::upload(UploadedFile::fake()->image('my.photo.jpeg', 40, 40), ['thumbnail' => ['width' => 10]]);
+
+    ob_start();
+    imagepng(imagecreatetruecolor(40, 40));
+    $png = Uploader::upload($this->realFile('scan', (string) ob_get_clean()), ['thumbnail' => ['width' => 10]]);
+
+    // Older Symfony releases guess "jpeg" for image/jpeg, newer ones "jpg".
+    expect($jpeg->thumbnail->name)->toBe('my.photo-thumbnail.'.$jpeg->thumbnail->extension)
+        ->and($png->thumbnail->name)->toBe('scan-thumbnail.png');
+
+    $this->get($png->thumbnail->url)->assertHeader('Content-Disposition', 'inline; filename=scan-thumbnail.png');
 });
 
 test('it resizes a thumbnail to a fixed size', function () {
