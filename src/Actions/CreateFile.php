@@ -200,10 +200,9 @@ class CreateFile
         try {
             $image->save($temporary, 100, $file->extension());
 
-            return $this->handle(
-                new UploadedFile($temporary, $file->getClientOriginalName().'-thumbnail', $image->mime()),
-                $options
-            );
+            $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'-thumbnail.'.$file->extension();
+
+            return $this->handle(new UploadedFile($temporary, $name, $image->mime()), $options);
         } finally {
             @unlink($temporary);
         }

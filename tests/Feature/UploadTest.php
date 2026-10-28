@@ -105,10 +105,26 @@ class UploadTest extends TestCase
         $thumbnail = $upload->thumbnail;
 
         $this->assertInstanceOf(Upload::class, $thumbnail);
-        $this->assertSame('photo.jpg-thumbnail', $thumbnail->name);
+        $this->assertContains($thumbnail->extension, ['jpg', 'jpeg']);
+        $this->assertSame('photo-thumbnail.'.$thumbnail->extension, $thumbnail->name);
         $this->assertSame('image/jpeg', $thumbnail->mime);
         $this->assertSame([100, 50], array_slice((array) getimagesizefromstring((string) Storage::disk('local')->get($thumbnail->path)), 0, 2));
         $this->assertNull($thumbnail->thumbnail_id);
+    }
+
+    public function test_the_thumbnail_name_ends_with_the_thumbnail_extension(): void
+    {
+        $this->requiresGd();
+
+        $jpeg = Uploader::upload(UploadedFile::fake()->image('my.photo.jpeg', 40, 40), ['thumbnail' => ['width' => 10]]);
+        ob_start();
+        imagepng(imagecreatetruecolor(40, 40));
+        $png = Uploader::upload($this->realFile('scan', (string) ob_get_clean()), ['thumbnail' => ['width' => 10]]);
+
+        // Older Symfony releases guess "jpeg" for image/jpeg, newer ones "jpg".
+        $this->assertSame('my.photo-thumbnail.'.$jpeg->thumbnail->extension, $jpeg->thumbnail->name);
+        $this->assertSame('scan-thumbnail.png', $png->thumbnail->name);
+        $this->get($png->thumbnail->url)->assertHeader('Content-Disposition', 'inline; filename=scan-thumbnail.png');
     }
 
     public function test_it_resizes_a_thumbnail_to_a_fixed_size(): void
