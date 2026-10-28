@@ -8,7 +8,7 @@ Upload files to any Laravel disk with hashed names, optional image thumbnails, S
 
 ## Supported Laravel lines
 
-One branch per Laravel major, from `6.x` to the newest major. Each line's PHP range, `illuminate/*` constraint, and tools follow the Pharaonic Laravel line table. `6.x` runs PHPUnit; later lines run Pest.
+One branch per Laravel major, from `6.x` to the newest major. Each line's PHP range, `illuminate/*` constraint, and tools follow the Pharaonic Laravel line table. `6.x` runs PHPUnit, because Pest cannot install on Laravel 6; later lines run Pest.
 
 Releases 1.x–3.x supported Laravel 6+, and 4.x supported Laravel 9+. The `N.x` lines replace them; 4.x receives no further releases.
 
