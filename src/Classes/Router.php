@@ -2,23 +2,19 @@
 
 namespace Pharaonic\Laravel\Uploader\Classes;
 
-/**
- * @method array action()
- * @method string uri()
- */
 class Router
 {
     /**
      * The options list.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected array $options;
 
     /**
      * Create a new Router instance.
      *
-     * @param array $options
+     * @param  array<mixed>  $options
      */
     public function __construct(array $options)
     {
@@ -26,22 +22,26 @@ class Router
     }
 
     /**
-     * Get route action.
+     * Get the route action (the controller class).
      *
-     * @return array
+     * @return string
      */
     public function action()
     {
-        return $this->options['controller'];
+        $controller = $this->options['controller'] ?? null;
+
+        return is_string($controller) ? $controller : \Pharaonic\Laravel\Uploader\Http\Controllers\UploadController::class;
     }
 
     /**
-     * Get route URI.
+     * Get the route URI.
      *
      * @return string
      */
     public function uri()
     {
-        return $this->options['uri'] . '/{hash}';
+        $uri = $this->options['uri'] ?? null;
+
+        return (is_string($uri) ? $uri : '/file').'/{hash}';
     }
 }
