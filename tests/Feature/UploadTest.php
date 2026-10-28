@@ -155,6 +155,8 @@ class UploadTest extends TestCase
 
     public function test_a_thumbnail_the_image_driver_cannot_read_leaves_nothing_stored(): void
     {
+        $this->requiresGd();
+
         $file = UploadedFile::fake()->create('scan.tiff', 1, 'image/tiff');
 
         try {
