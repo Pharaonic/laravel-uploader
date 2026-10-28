@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 9.0.0 - Unreleased
+## 9.0.0 - 2026-10-28
 
 `9.x` supports Laravel 9 on PHP 8.0, 8.1 and 8.2.
 
@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - Requires `pharaonic/laravel-readable` `^9.0`.
 - The same API, configuration, route, migrations and behavior as 8.0.0, including the deprecated `Pharaonic.uploader` key.
 
-## 8.0.0 - Unreleased
+## 8.0.0 - 2026-10-28
 
 `8.x` supports Laravel 8 on PHP 8.0 and 8.1.
 
@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - Requires `pharaonic/laravel-readable` `^8.0`.
 - The same API, configuration, route, migrations and behavior as 7.0.0, including the deprecated `Pharaonic.uploader` key.
 
-## 7.0.0 - Unreleased
+## 7.0.0 - 2026-10-28
 
 `7.x` supports Laravel 7 on PHP 8.0.
 
@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
 - Requires `pharaonic/laravel-readable` `^7.0`.
 - The same API, configuration, route, migrations and behavior as 6.0.0, including the deprecated `Pharaonic.uploader` key.
 
-## 6.1.0 - Unreleased
+## 6.1.0 - 2026-10-28
 
 ### Changed
 
