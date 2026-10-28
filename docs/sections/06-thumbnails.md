@@ -8,7 +8,7 @@ $upload = upload($request->file('photo'), [
 ]);
 
 $upload->thumbnail->url;  // URL of the 300 px wide copy
-$upload->thumbnail->name; // "photo.jpg-thumbnail"
+$upload->thumbnail->name; // "photo-thumbnail.jpg" for photo.jpg
 ```
 
 ### Sizing
@@ -35,7 +35,7 @@ A `thumbnail` option without `width` or `height` throws `InvalidArgumentExceptio
 
 Thumbnails are made for files with an `image/*` MIME type other than SVG. For any other file, including SVG, the option is ignored and the file is stored without a thumbnail. The image driver must be able to read the format: GD reads JPEG, PNG, GIF, WebP and BMP, and Imagick reads more.
 
-The thumbnail uses the same `disk`, `path` and `visibility` options as the original, and deleting the original deletes it too.
+The thumbnail keeps the original's format. Its name is the original name with `-thumbnail` before its own `extension` (`photo.png` gives `photo-thumbnail.png`), and it uses the same `disk`, `path` and `visibility` options as the original. Deleting the original deletes it too.
 
 :::info Image driver
 Thumbnails are generated with Intervention Image 2, using GD by default. To use Imagick, publish Intervention's configuration with `php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"` and set `driver` to `imagick`.
