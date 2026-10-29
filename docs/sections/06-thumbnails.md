@@ -38,5 +38,5 @@ Thumbnails are made for files with an `image/*` MIME type other than SVG. For an
 The thumbnail keeps the original's format. Its name is the original name with `-thumbnail` before its own `extension` (`photo.png` gives `photo-thumbnail.png`), and it uses the same `disk`, `path` and `visibility` options as the original. Deleting the original deletes it too.
 
 :::info Image driver
-Thumbnails are generated with Intervention Image 2, using GD by default. To use Imagick, publish Intervention's configuration with `php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"` and set `driver` to `imagick`.
+Thumbnails are generated with Intervention Image 2, using GD by default. To use Imagick, publish Intervention's configuration with `php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"` and set `driver` to `imagick`. Laravel 13's own image component (`config/images.php`) does not change how the package makes thumbnails.
 :::
