@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 12.0.0 - Unreleased
+## 12.0.0 - 2026-10-29
 
 `12.x` supports Laravel 12 on PHP 8.2, 8.3, 8.4 and 8.5.
 
