@@ -22,7 +22,7 @@ $upload->temporaryUrl(5);   // valid for 5 minutes
 $upload->temporary_url;     // attribute form, default lifetime
 ```
 
-The URL makes the browser use the upload's original name. A disk that cannot create temporary URLs, such as `local`, throws `RuntimeException`.
+The URL makes the browser use the upload's original name. A disk that cannot create temporary URLs throws `RuntimeException`. A `local` disk creates them only when Laravel serves it (`'serve' => true` in its disk config).
 
 ### Visibility
 

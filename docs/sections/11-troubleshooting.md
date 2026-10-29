@@ -18,7 +18,7 @@ The `thumbnail` option needs a `width`, a `height`, or both. Nothing was stored.
 
 ### "The driver local does not support temporary URLs."
 
-`temporaryUrl()` needs a disk that can sign URLs, such as S3. For local files, use `url()`, which points to the package file route.
+`temporaryUrl()` needs a disk that can sign URLs, such as S3, or a local disk that Laravel serves (`'serve' => true` in its disk config). For local files, `url()` points to the package file route instead.
 
 ### The file route returns 404
 
