@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 12.0.0 - Unreleased
+
+`12.x` supports Laravel 12 on PHP 8.2, 8.3, 8.4 and 8.5.
+
+### Compatibility
+
+- Laravel 12.0+ on PHP 8.2, 8.3, 8.4 or 8.5.
+- Requires `pharaonic/laravel-readable` `^12.0`.
+- The same API, configuration, route, migrations and behavior as 11.0.0, including the deprecated `Pharaonic.uploader` key.
+- `temporaryUrl()` on a `local` disk that Laravel serves (`'serve' => true`, the Laravel 12 default) returns the framework's signed URL instead of throwing; `url()` still uses the package file route for the `local` disk.
+
 ## 11.0.0 - Unreleased
 
 `11.x` supports Laravel 11 on PHP 8.2, 8.3 and 8.4.
