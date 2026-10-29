@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 10.0.0 - Unreleased
+## 10.0.0 - 2026-10-29
 
 `10.x` supports Laravel 10 on PHP 8.1, 8.2 and 8.3.
 
