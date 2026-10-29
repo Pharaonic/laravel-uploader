@@ -1,6 +1,6 @@
 ## Upgrading from 4.x
 
-The `11.x` line runs on Laravel 11 with PHP 8.2, 8.3 or 8.4. Most applications upgrade without code changes; check the points below.
+The `12.x` line runs on Laravel 12 with PHP 8.2, 8.3, 8.4 or 8.5. Most applications upgrade without code changes; check the points below.
 
 ### Database
 
