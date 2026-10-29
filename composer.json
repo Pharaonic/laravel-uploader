@@ -26,22 +26,22 @@
         "source": "https://github.com/Pharaonic/laravel-uploader"
     },
     "require": {
-        "php": ">=8.2 <8.6",
-        "illuminate/contracts": "^12.0",
-        "illuminate/database": "^12.0",
-        "illuminate/filesystem": "^12.0",
-        "illuminate/http": "^12.0",
-        "illuminate/routing": "^12.0",
-        "illuminate/support": "^12.0",
+        "php": ">=8.3 <8.6",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/filesystem": "^13.0",
+        "illuminate/http": "^13.0",
+        "illuminate/routing": "^13.0",
+        "illuminate/support": "^13.0",
         "intervention/image": "^2.7",
-        "pharaonic/laravel-readable": "^12.0"
+        "pharaonic/laravel-readable": "^13.0"
     },
     "require-dev": {
         "laravel/pint": "^1.20",
-        "orchestra/testbench": "^10.0",
-        "pestphp/pest": "^3.8 || ^4.0",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^4.0",
         "phpstan/phpstan": "^2.1.33",
-        "phpunit/phpunit": "^11.5.50 || ^12.5.8"
+        "phpunit/phpunit": "^12.5.8"
     },
     "suggest": {
         "ext-gd": "Required by Intervention Image to generate thumbnails, unless ext-imagick is configured.",
