@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 13.0.0 - Unreleased
+## 13.0.0 - 2026-10-29
 
 `13.x` supports Laravel 13 on PHP 8.3, 8.4 and 8.5.
 
