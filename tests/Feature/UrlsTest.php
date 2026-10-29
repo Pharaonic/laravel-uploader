@@ -63,8 +63,16 @@ test('a public disk file URL comes from the disk', function () {
 });
 
 test('a local file has no temporary URL', function () {
+    config(['filesystems.disks.local.serve' => false]);
+
     uploadRecord(['disk' => 'local'])->temporaryUrl();
 })->throws(RuntimeException::class, 'The driver local does not support temporary URLs.');
+
+test('a served local file has a temporary URL', function () {
+    $url = uploadRecord(['disk' => 'local'])->temporaryUrl();
+
+    expect($url)->toContain('files/file.pdf')->toContain('signature=');
+});
 
 test('a private S3 file URL is a temporary URL', function () {
     Carbon::setTestNow('2026-01-15 12:00:00');
