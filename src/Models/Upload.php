@@ -68,7 +68,7 @@ class Upload extends Model
     /**
      * Getting Thumbnail Object
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<static, $this>
      */
     public function thumbnail()
     {
