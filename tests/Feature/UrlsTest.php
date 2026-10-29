@@ -68,10 +68,12 @@ test('a local file has no temporary URL', function () {
     uploadRecord(['disk' => 'local'])->temporaryUrl();
 })->throws(RuntimeException::class, 'The driver local does not support temporary URLs.');
 
-test('a served local file has a temporary URL', function () {
-    $url = uploadRecord(['disk' => 'local'])->temporaryUrl();
+test('a local disk that builds temporary URLs gives a temporary URL', function () {
+    /** @var FilesystemAdapter $disk */
+    $disk = Storage::disk('local');
+    $disk->buildTemporaryUrlsUsing(fn (string $path) => 'https://signed.test/'.$path);
 
-    expect($url)->toContain('files/file.pdf')->toContain('signature=');
+    expect(uploadRecord(['disk' => 'local'])->temporaryUrl())->toBe('https://signed.test/files/file.pdf');
 });
 
 test('a private S3 file URL is a temporary URL', function () {

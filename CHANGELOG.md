@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 13.0.0 - Unreleased
+
+`13.x` supports Laravel 13 on PHP 8.3, 8.4 and 8.5.
+
+### Compatibility
+
+- Laravel 13.0+ on PHP 8.3, 8.4 or 8.5. PHP 8.2 is no longer supported on this line.
+- Requires `pharaonic/laravel-readable` `^13.0`.
+- The same API, configuration, route, migrations and behavior as 12.0.0, including the deprecated `Pharaonic.uploader` key.
+- Thumbnails still use Intervention Image 2 and its `image` configuration. Laravel 13 binds `image` to its own image manager, so the package creates the Intervention manager itself instead of using the `Image` facade.
+
 ## 12.0.0 - Unreleased
 
 `12.x` supports Laravel 12 on PHP 8.2, 8.3, 8.4 and 8.5.
