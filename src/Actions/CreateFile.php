@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Constraint;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 use InvalidArgumentException;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
 use Pharaonic\Laravel\Uploader\Models\Upload;
@@ -179,7 +179,9 @@ class CreateFile
      */
     protected function uploadThumbnail(UploadedFile $file, array $thumbnail, array $options = [])
     {
-        $image = Image::make($file);
+        // Laravel 13 binds `image` to its own image manager, so the Intervention facade is not used.
+        $config = Config::get('image');
+        $image = (new ImageManager(is_array($config) ? $config : []))->make($file);
 
         if ($thumbnail['ratio']) {
             $image->resize(
