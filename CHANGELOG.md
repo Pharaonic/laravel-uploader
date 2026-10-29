@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 11.0.0 - Unreleased
+## 11.0.0 - 2026-10-29
 
 `11.x` supports Laravel 11 on PHP 8.2, 8.3 and 8.4.
 
