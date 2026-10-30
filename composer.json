@@ -33,7 +33,7 @@
         "illuminate/http": "^13.0",
         "illuminate/routing": "^13.0",
         "illuminate/support": "^13.0",
-        "intervention/image": "^2.7",
+        "intervention/image": "^2.7 || ^4.0",
         "pharaonic/laravel-readable": "^13.0"
     },
     "require-dev": {
