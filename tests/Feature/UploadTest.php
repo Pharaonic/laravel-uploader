@@ -144,7 +144,7 @@ test('it makes thumbnails with the driver Laravel\'s images.default names', func
 
     config(['images.default' => 'imagick']);
 
-    $upload = fn () => Uploader::upload(UploadedFile::fake()->image('photo.png', 40, 40), ['thumbnail' => ['width' => 10]]);
+    $upload = fn () => Uploader::upload(UploadedFile::fake()->image('photo.png', 40, 40), ['thumbnail' => ['width' => 10, 'height' => 10]]);
 
     if (extension_loaded('imagick')) {
         expect(array_slice((array) getimagesizefromstring((string) Storage::disk('local')->get($upload()->thumbnail->path)), 0, 2))->toBe([10, 10]);
