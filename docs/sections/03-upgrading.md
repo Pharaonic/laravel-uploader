@@ -1,3 +1,11 @@
+## Upgrading from 13.0
+
+13.1 generates thumbnails with Intervention Image 4 instead of 2. The package's own API, options and stored files do not change.
+
+- If your application calls Intervention Image 2 itself (`Image::make()`, `Intervention\Image\Facades\Image`), it now has to require `intervention/image` 2 on its own, which Composer cannot install next to 13.1. Move that code to Intervention Image 4 or to Laravel's `Illuminate\Image` component, or stay on 13.0.
+- The Imagick driver is chosen with `IMAGE_DRIVER=imagick` (`images.default`, Laravel 13.21+). A published `config/image.php` from Intervention Image 2 is no longer read, and can be deleted.
+- An image the driver cannot read throws `Intervention\Image\Exceptions\ImageDecoderException` instead of `Intervention\Image\Exception\NotReadableException`.
+
 ## Upgrading from 4.x
 
 The `13.x` line runs on Laravel 13 with PHP 8.3, 8.4 or 8.5. Most applications upgrade without code changes; check the points below.
