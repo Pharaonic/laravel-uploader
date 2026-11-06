@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 13.1.0 - Unreleased
+
+### Changed
+
+- Thumbnails are generated with Intervention Image 4 (`intervention/image` `^4.0`) instead of 2, the same major Laravel 13's image component uses. Applications that use Intervention Image 2 themselves can no longer install this release next to it; see the upgrade guide.
+- The thumbnail driver follows Laravel's `images.default` setting (`IMAGE_DRIVER`): `imagick` uses Imagick, anything else GD. Intervention Image 2's `config/image.php` is no longer read.
+- An image the driver cannot read throws `Intervention\Image\Exceptions\ImageDecoderException` instead of `Intervention\Image\Exception\NotReadableException`.
+- Lines `6.x`–`12.x` keep Intervention Image 2.
+
 ## 13.0.0 - 2026-10-29
 
 `13.x` supports Laravel 13 on PHP 8.3, 8.4 and 8.5.
