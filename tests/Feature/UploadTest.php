@@ -3,7 +3,8 @@
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Exception\NotReadableException;
+use Intervention\Image\Exceptions\ImageDecoderException;
+use Intervention\Image\Exceptions\MissingDependencyException;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
 use Pharaonic\Laravel\Uploader\Models\Upload;
 
@@ -132,7 +133,26 @@ test('a thumbnail the image driver cannot read leaves nothing stored', function 
     $file = UploadedFile::fake()->create('scan.tiff', 1, 'image/tiff');
 
     // The original is stored before the thumbnail fails, then removed.
-    expect(fn () => Uploader::upload($file, ['thumbnail' => ['width' => 10]]))->toThrow(NotReadableException::class);
+    expect(fn () => Uploader::upload($file, ['thumbnail' => ['width' => 10]]))->toThrow(ImageDecoderException::class);
+
+    expect(Upload::query()->count())->toBe(0)
+        ->and(Storage::disk('local')->allFiles())->toBe([]);
+});
+
+test('it makes thumbnails with the driver Laravel\'s images.default names', function () {
+    $this->requiresGd();
+
+    config(['images.default' => 'imagick']);
+
+    $upload = fn () => Uploader::upload(UploadedFile::fake()->image('photo.png', 40, 40), ['thumbnail' => ['width' => 10]]);
+
+    if (extension_loaded('imagick')) {
+        expect(array_slice((array) getimagesizefromstring((string) Storage::disk('local')->get($upload()->thumbnail->path)), 0, 2))->toBe([10, 10]);
+
+        return;
+    }
+
+    expect($upload)->toThrow(MissingDependencyException::class);
 
     expect(Upload::query()->count())->toBe(0)
         ->and(Storage::disk('local')->allFiles())->toBe([]);

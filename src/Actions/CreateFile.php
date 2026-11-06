@@ -6,7 +6,9 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Constraint;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\Encoders\AutoEncoder;
 use Intervention\Image\ImageManager;
 use InvalidArgumentException;
 use Pharaonic\Laravel\Uploader\Facades\Uploader;
@@ -179,19 +181,16 @@ class CreateFile
      */
     protected function uploadThumbnail(UploadedFile $file, array $thumbnail, array $options = [])
     {
-        // Laravel 13 binds `image` to its own image manager, so the Intervention facade is not used.
-        $config = Config::get('image');
-        $image = (new ImageManager(is_array($config) ? $config : []))->make($file);
+        $image = $this->imageManager()->decodePath($file->getRealPath());
 
         if ($thumbnail['ratio']) {
-            $image->resize(
-                $thumbnail['width'],
-                $thumbnail['width'] ? null : $thumbnail['height'],
-                fn (Constraint $constraint) => $constraint->aspectRatio()
-            );
+            $image->scale($thumbnail['width'], $thumbnail['width'] ? null : $thumbnail['height']);
         } else {
             $image->resize($thumbnail['width'], $thumbnail['height']);
         }
+
+        // The thumbnail keeps the format the original decoded as.
+        $encoded = $image->encode(new AutoEncoder(quality: 100));
 
         $temporary = tempnam(sys_get_temp_dir(), 'pharaonic-thumb-');
 
@@ -200,13 +199,25 @@ class CreateFile
         }
 
         try {
-            $image->save($temporary, 100, $file->extension());
+            $encoded->save($temporary);
 
             $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'-thumbnail.'.$file->extension();
 
-            return $this->handle(new UploadedFile($temporary, $name, $image->mime()), $options);
+            return $this->handle(new UploadedFile($temporary, $name, $encoded->mediaType()), $options);
         } finally {
             @unlink($temporary);
         }
+    }
+
+    /**
+     * Create the image manager for the driver Laravel's `images.default` names: imagick, otherwise GD.
+     *
+     * Laravel merges `images.default` from its own config from 13.21; before that the key is unset and GD is used.
+     */
+    protected function imageManager(): ImageManager
+    {
+        $driver = Config::get('images.default') === 'imagick' ? ImagickDriver::class : GdDriver::class;
+
+        return new ImageManager($driver);
     }
 }
