@@ -14,7 +14,7 @@ Releases 1.x–3.x supported Laravel 6+, and 4.x supported Laravel 9+. The `N.x`
 
 ## Core library
 
-None. File sizes are formatted by `pharaonic/laravel-readable` (`readable_file_size()`), required at the same Laravel line. Thumbnails use `intervention/image` 2.x, kept on every line because 3.x needs PHP 8.1 and drops the Laravel facade.
+None. File sizes are formatted by `pharaonic/laravel-readable` (`readable_file_size()`), required at the same Laravel line. Thumbnails use `intervention/image` 4.x from `13.x` (13.1.0), whose PHP 8.3 floor only that line meets; `6.x`–`12.x` stay on 2.x, because 3.x needs PHP 8.1 and drops the Laravel facade. This is the one place where the lines' code differs: `CreateFile::uploadThumbnail()` and `imageManager()`, plus the thumbnail tests. On 4.x the driver follows Laravel's `images.default` (`imagick`, otherwise GD), the same setting Laravel's own image component uses.
 
 ## Public API invariants
 
