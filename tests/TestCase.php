@@ -4,7 +4,6 @@ namespace Pharaonic\Laravel\Uploader\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Intervention\Image\ImageServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Pharaonic\Laravel\Readable\ReadableServiceProvider;
 use Pharaonic\Laravel\Uploader\UploaderServiceProvider;
@@ -32,7 +31,6 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            ImageServiceProvider::class,
             ReadableServiceProvider::class,
             UploaderServiceProvider::class,
         ];

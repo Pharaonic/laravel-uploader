@@ -6,8 +6,8 @@ Install the package with Composer. Laravel discovers the service provider automa
 
 - PHP 8.3, 8.4 or 8.5
 - Laravel 13.0 or newer within 13.x
-- `pharaonic/laravel-readable` 13.x and `intervention/image` 2.7+ (installed automatically)
-- The GD or Imagick extension, only to generate thumbnails
+- `pharaonic/laravel-readable` 13.x and `intervention/image` 4.x (installed automatically)
+- The GD or Imagick extension, only to generate thumbnails (GD by default)
 - `league/flysystem-aws-s3-v3`, only to store files on S3
 
 ### Composer Installation

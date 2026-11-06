@@ -6,7 +6,7 @@ The `thumbnail` option only applies to images other than SVG. Check that the fil
 
 ### "Unsupported image type"
 
-The image driver cannot read the format, such as TIFF or HEIC with GD. Switch Intervention Image to Imagick, or upload without the `thumbnail` option.
+The image driver cannot read the format, such as TIFF or HEIC with GD. Set `IMAGE_DRIVER=imagick` to use Imagick, or upload without the `thumbnail` option.
 
 ### "You have to set width or height thumbnail's option."
 
